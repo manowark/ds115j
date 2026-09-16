@@ -11,4 +11,8 @@ parts in order and verifies the original archive SHA-256:
 9d869bf8f45f6f3908097aece847bb2d1bde4a6213801cb8460cdb83f9a30eb6
 ```
 
-Verify the parts independently with `shasum -a 256 -c rootfs/SHA256SUMS`.
+Verify the parts independently from the repository root with:
+
+```bash
+(cd rootfs && shasum -a 256 -c SHA256SUMS)
+```
