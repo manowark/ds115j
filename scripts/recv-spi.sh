@@ -29,7 +29,7 @@ with open(path, "wb") as f:
 c.close(); s.close()
 PY
 
-SIZE=$(stat -c %s "$OUT")
+SIZE=$(wc -c < "$OUT")
 echo "received $SIZE bytes -> $OUT"
 sha256sum "$OUT" | tee "$OUT.sha256"
 if [ "$SIZE" -ne "$EXPECT" ]; then

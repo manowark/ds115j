@@ -113,34 +113,24 @@ If `sda2` is fine, skip to [§5](#5-install-boot-images-on-sda2) after filling `
 U-Boot needs **MBR (dos)** and **partition 2 = boot**. Prefer 1 MiB alignment on a blank disk (the live NAS still has historical start-sector 63; do not clone that to a new drive unless you are restoring this exact disk).
 
 Create a 1 MiB-aligned MBR layout with the BusyBox `fdisk` included in the
-recovery ramdisk. This exact input creates 64 GiB root, 128 MiB boot, and data
-using the rest of the disk:
+recovery ramdisk:
 
 ```sh
-fdisk /dev/sda <<'EOF'
-o
-n
-p
-1
-2048
-+64G
-n
-p
-2
-
-+128M
-n
-p
-3
-
-
-w
-EOF
-fdisk -l /dev/sda
+fdisk /dev/sda
 ```
 
-Before formatting, verify the listing shows `sda1` starting at sector `2048`,
-`sda2` as partition 2 with 128 MiB, and `sda3` consuming the remainder. Then:
+At the prompts:
+
+1. If `fdisk` asks `Do you want to create a disklabel?`, answer `y`.
+2. At `Command`, type `o` to create a DOS/MBR label.
+3. Type `n`, `p`, `1`, `2048`, `+64G` for `sda1`.
+4. Type `n`, `p`, `2`, Enter for the default start, `+128M` for `sda2`.
+5. Type `n`, `p`, `3`, Enter, Enter for `sda3` using the remaining space.
+6. Type `p`. Verify `sda1` starts at sector `2048`, `sda2` is partition 2
+   and 128 MiB, and `sda3` consumes the remainder.
+7. Only if that listing is correct, type `w`. Otherwise type `q` and retry.
+
+Then:
 
 ```sh
 mkfs.ext4 -L rootfs /dev/sda1
@@ -154,6 +144,7 @@ The complete rootfs is in Git as two files below 95 MB. On the laptop,
 reconstruct it and serve the repository over HTTP:
 
 ```bash
+cd /path/to/ds115j
 scripts/reconstruct-rootfs.sh
 python3 -m http.server 45152 --bind 0.0.0.0 --directory "$PWD"
 ```
