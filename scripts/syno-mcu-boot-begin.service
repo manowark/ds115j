@@ -1,0 +1,14 @@
+[Unit]
+Description=DS115j MCU boot indicator (power LED blink + status LED orange steady)
+DefaultDependencies=no
+After=systemd-udevd-kernel.socket
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/syno-mcu-boot.sh begin
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=systemd-udevd-kernel.socket

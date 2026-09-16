@@ -1,0 +1,7 @@
+[Unit]
+Description=Reconcile DS115j amber disk LED with SMART health
+After=smartmontools.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/smart-amber-led.sh check

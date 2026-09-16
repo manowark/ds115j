@@ -1,0 +1,12 @@
+# Live layout captured 2026-09-16 from the daily-ready NAS.
+# sector-size: 512 (device reports 4096 physical). Do not apply blindly
+# to a different-capacity disk — use docs/install-uart.md instead.
+label: dos
+label-id: 0x00000000
+device: /dev/sda
+unit: sectors
+sector-size: 512
+
+/dev/sda1 : start=          63, size=   134217728, type=83
+/dev/sda2 : start=   134217791, size=      262144, type=83
+/dev/sda3 : start=   134481920, size=  3772547248, type=83

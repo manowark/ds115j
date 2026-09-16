@@ -1,0 +1,1 @@
+vermagic=6.12.107+deb13-armmp SMP mod_unload modversions ARMv7 p2v8

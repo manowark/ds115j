@@ -1,0 +1,19 @@
+auto lo
+iface lo inet loopback
+
+# Uplink: DHCP when a server answers (preferred default route via metric 100).
+# Pre-up and post-up guarantee permanent .233 on eth0:1 and fallback default route.
+auto eth0
+iface eth0 inet dhcp
+	hostname ds115j
+	metric 100
+	pre-up /sbin/modprobe marvell
+	pre-up /sbin/modprobe mvmdio
+	pre-up /sbin/modprobe mvneta
+	pre-up /sbin/ip link set dev eth0 address 00:11:32:4d:c3:b8
+	pre-up /sbin/ip link set dev eth0 up
+	pre-up /sbin/ip addr add 192.168.68.233/22 broadcast 192.168.71.255 dev eth0 label eth0:1 || true
+	pre-up /sbin/ip route add default via 192.168.68.1 dev eth0 metric 200 || true
+	post-up /sbin/ip addr add 192.168.68.233/22 broadcast 192.168.71.255 dev eth0 label eth0:1 || true
+	post-up /sbin/ip route add default via 192.168.68.1 dev eth0 metric 200 || true
+	dns-nameservers 192.168.68.1 1.1.1.1

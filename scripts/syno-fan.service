@@ -1,0 +1,15 @@
+[Unit]
+Description=DS115j balanced fan control (SoC temperature, °C hysteresis)
+After=systemd-udevd.service systemd-modules-load.service
+Wants=systemd-udevd.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/syno-fan.sh
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,53 @@
+# HANDOFF artifacts MANIFEST
+
+Generated: 2026-09-15 19:51 UTC on helper 192.168.68.250
+Updated: 2026-09-16 (noalarm deploy additions)
+Copies are byte copies (cp -a / rsync -a), not symlinks to /srv/tftp.
+
+BYTES    SHA-256                                                              PATH
+8388608  cfbdc0dd57e3949957dbab23eb6befe84112fc36ed3b8a4e142c9ad78239dfc4  spi/ds115j-spi-8m-20260915-124830.bin
+65536    9cc6345f4a694d492b6aa4142198bf389d2ebfd63bbe964b09d2e70dd635daad  spi/ds115j-vendor-20260915-124844.bin
+4754     8492da22688f65840a664e72f6aabd18426d2e1514d9437ef7187a74ad6bcb79  ds115j.dts
+13960    cf192fe77338447a2f9949bf9640efe0b77c5cf7316d680a873057c5d4e3914b  ds115j.dtb
+13960    cf192fe77338447a2f9949bf9640efe0b77c5cf7316d680a873057c5d4e3914b  ds115j-poweroff-i2c.dtb
+139524   3354e4fb61ecb21afcdb09e80180e152d9b2a3313e97f1394db6cef79312b053  qnap-poweroff-ds115j.ko
+139524   3354e4fb61ecb21afcdb09e80180e152d9b2a3313e97f1394db6cef79312b053  qnap-poweroff-module/qnap-poweroff-ds115j.ko
+3111     47d6bf17159d92eb4d5e4af43cde24994676e345eef351753b6cbe1cb4adfd95  qnap-poweroff-module/qnap-poweroff-ds115j.c
+32       381f0a49e73b17afb5c9497474be446722823a035177f6b996c478c9cdd8e435  qnap-poweroff-module/Makefile
+6060232  c1688fda25f1472d4b7b5b65b5ecc2a4d7b8a780cd9d6bb26c7c7df92d1c6a23  tftp/uImage-ds115j
+6060232  c1688fda25f1472d4b7b5b65b5ecc2a4d7b8a780cd9d6bb26c7c7df92d1c6a23  uImage-ds115j.from-helper-artifacts
+6060240  69e60698a993b487f131c0b5120a960643b43fe46d6e5aee7d779908ee425bbc  tftp/uImage-ds115j.pre-poweroff-i2c-20260915-1638
+6060292  268eebcce70e1ace470f97e0a766a9f3f806c77c9bbd749d82015c521f7c0ee4  tftp/uImage-ds115j.with-unbound-rtc68-20260915
+3300604  dbbd30ec2c3772e2816eaa5e3295b0580a357fc93458dcb3bf063bf7bf65cd75  tftp/uRamdisk-hdd-ds115j
+3247969  cc9e6bc063a1247c3f370a87238f6ff544ff01ba145aed19f537b13d2810dd96  tftp/uRamdisk-recovery-ds115j
+3247969  cc9e6bc063a1247c3f370a87238f6ff544ff01ba145aed19f537b13d2810dd96  tftp/uRamdisk-ds115j
+13960    cf192fe77338447a2f9949bf9640efe0b77c5cf7316d680a873057c5d4e3914b  tftp/ds115j-poweroff-i2c.dtb
+139524   3354e4fb61ecb21afcdb09e80180e152d9b2a3313e97f1394db6cef79312b053  tftp/qnap-poweroff-ds115j.ko
+6060176  5ea71e0bc69a17ae269e278eedc28288702f1259edffefd97d420e01141ae3e8  tftp/uImage-ds115j.new-noalarm
+6060176  5ea71e0bc69a17ae269e278eedc28288702f1259edffefd97d420e01141ae3e8  noalarm/uImage-ds115j.new-noalarm
+6060112  dd7d739877178a943103f2b270a402afb0f1b9ab8c31378083f24e34e802ed31  noalarm/kernel-ds115j-noalarm.bin
+
+Symlinks inside artifacts/spi/ (copied from backups/spi):
+  ds115j-spi-8m.bin -> ds115j-spi-8m-20260915-124830.bin (or absolute original)
+  ds115j-vendor.bin -> ds115j-vendor-20260915-124844.bin
+
+2026-09-15 21:10 UTC added:
+  artifacts/chrony-tracking-20260915.txt  (MUST-5 NTP/RTC verification)
+
+2026-09-15 21:54 UTC added:
+  ../MUST-1-4-VERIFICATION.md
+  artifacts/must-1-4-live-probe-20260915.txt
+  artifacts/smartctl-a-20260915-2153.txt
+  artifacts/sda-partition-table-20260915.txt
+
+Not copied (remain on helper; too large):
+  /root/ds115j/linux (~2.3G)
+  /root/ds115j/rootfs (~284M)
+  /root/ds115j/rootfs-trixie-armhf.tar.gz (134385614 bytes, sha256 9d869bf8f45f6f3908097aece847bb2d1bde4a6213801cb8460cdb83f9a30eb6)
+  /root/ds115j/kernel (~139M)  NOTE: kernel/uImage-ds115j is STALE (69e60698...)
+
+2026-09-16 MUST-1 deploy added (handoff commit):
+  tftp/uImage-ds115j.new-noalarm  (current deployed kernel+DTB; same zImage as c1688fda, DTB has no alarm-gpios)
+  noalarm/uImage-ds115j.new-noalarm  (HANDOFF copy)
+  noalarm/kernel-ds115j-noalarm.bin  (uImage payload only)
+  NOTE: HANDOFF artifacts/ds115j.dts (8492da22) is STALE (still has alarm-gpios); live helper DTS linux/…/ds115j.dts (89bc51c8) is the fixed one.

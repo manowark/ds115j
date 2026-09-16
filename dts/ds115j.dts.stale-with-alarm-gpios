@@ -1,0 +1,201 @@
+/dts-v1/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include "armada-370.dtsi"
+
+/ {
+    model = "Synology DS115j";
+    compatible = "synology,ds115j", "marvell,armada370",
+                 "marvell,armada-370-xp";
+
+    chosen {
+        stdout-path = "serial0:115200n8";
+    };
+
+    memory@0 {
+        device_type = "memory";
+        reg = <0x00000000 0x10000000>; /* 256 MB */
+    };
+
+    gpio-fan {
+        compatible = "gpio-fan";
+        pinctrl-names = "default";
+        pinctrl-0 = <&fan_ctrl_low_pin &fan_ctrl_mid_pin
+                     &fan_ctrl_high_pin &fan_alarm_pin>;
+        gpios = <&gpio1 31 GPIO_ACTIVE_HIGH>,
+                <&gpio2 0 GPIO_ACTIVE_HIGH>,
+                <&gpio2 1 GPIO_ACTIVE_HIGH>;
+        alarm-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
+        /*
+         * This exact map initialized successfully and was reported to
+         * control the fan on a DS115j in the Doozan test boot.
+         */
+        gpio-fan,speed-map = <   0 0>,
+                             <1000 1>,
+                             <1150 2>,
+                             <1350 4>,
+                             <1500 3>,
+                             <1650 5>,
+                             <1750 6>,
+                             <1900 7>;
+    };
+
+    gpio-leds {
+        compatible = "gpio-leds";
+        pinctrl-names = "default";
+        pinctrl-0 = <&disk_led_pin>;
+
+        disk-led-amber {
+            label = "synology:amber:disk";
+            gpios = <&gpio0 31 GPIO_ACTIVE_LOW>;
+            default-state = "keep";
+        };
+    };
+
+    soc {
+        ranges = <MBUS_ID(0xf0, 0x01) 0 0xf1000000 0x100000
+                  MBUS_ID(0x01, 0xe0) 0 0xfff00000 0x100000
+                  MBUS_ID(0x09, 0x01) 0 0xf1100000 0x10000>;
+
+        internal-regs {
+            /*
+             * The PIC16LF1828 on UART1 controls power, the status LED,
+             * and the beeper. Linux's synology,power-off binding sends
+             * command "1" at 9600 baud when the system powers off.
+             */
+            poweroff@12100 {
+                compatible = "synology,power-off";
+                reg = <0x12100 0x100>;
+                clocks = <&coreclk 0>;
+            };
+        };
+    };
+};
+
+&uart0 {
+    status = "okay";
+};
+
+&uart1 {
+    status = "okay";
+};
+
+&usb0 {
+    status = "okay";
+};
+
+&usb1 {
+    status = "okay";
+};
+
+&mdio {
+    pinctrl-names = "default";
+    pinctrl-0 = <&mdio_pins>;
+
+    phy1: ethernet-phy@1 {
+        reg = <1>;
+    };
+};
+
+&eth0 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&ge0_rgmii_pins>;
+    status = "okay";
+    phy = <&phy1>;
+    phy-mode = "rgmii-id";
+};
+
+&sata {
+    status = "okay";
+    nr-ports = <1>;
+};
+
+&i2c0 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&i2c0_pins>;
+    clock-frequency = <100000>;
+    status = "okay";
+};
+
+&pinctrl {
+    disk_led_pin: disk-led-pin {
+        marvell,pins = "mpp31";
+        marvell,function = "gpio";
+    };
+
+    fan_ctrl_low_pin: fan-ctrl-low-pin {
+        marvell,pins = "mpp65";
+        marvell,function = "gpio";
+    };
+
+    fan_ctrl_mid_pin: fan-ctrl-mid-pin {
+        marvell,pins = "mpp64";
+        marvell,function = "gpio";
+    };
+
+    fan_ctrl_high_pin: fan-ctrl-high-pin {
+        marvell,pins = "mpp63";
+        marvell,function = "gpio";
+    };
+
+    fan_alarm_pin: fan-alarm-pin {
+        marvell,pins = "mpp38";
+        marvell,function = "gpio";
+    };
+};
+
+&spi0 {
+    status = "okay";
+
+    flash@0 {
+        compatible = "jedec,spi-nor";
+        reg = <0>;
+        spi-max-frequency = <20000000>;
+
+        /*
+         * Stock U-Boot identifies an MX25L6405D (8 MiB). Keep every
+         * partition read-only until a complete off-device dump exists.
+         */
+        partitions {
+            compatible = "fixed-partitions";
+            #address-cells = <1>;
+            #size-cells = <1>;
+
+            partition@0 {
+                label = "RedBoot";
+                reg = <0x00000000 0x000c0000>;
+                read-only;
+            };
+
+            partition@c0000 {
+                label = "zImage";
+                reg = <0x000c0000 0x002d0000>;
+                read-only;
+            };
+
+            partition@390000 {
+                label = "rd.gz";
+                reg = <0x00390000 0x00440000>;
+                read-only;
+            };
+
+            partition@7d0000 {
+                label = "vendor";
+                reg = <0x007d0000 0x00010000>;
+                read-only;
+            };
+
+            partition@7e0000 {
+                label = "RedBoot Config";
+                reg = <0x007e0000 0x00010000>;
+                read-only;
+            };
+
+            partition@7f0000 {
+                label = "FIS directory";
+                reg = <0x007f0000 0x00010000>;
+                read-only;
+            };
+        };
+    };
+};

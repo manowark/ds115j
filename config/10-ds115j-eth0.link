@@ -1,0 +1,6 @@
+[Match]
+OriginalName=eth0
+
+[Link]
+MACAddress=00:11:32:4d:c3:b8
+NamePolicy=keep

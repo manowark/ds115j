@@ -1,0 +1,5 @@
+# Do not use /dev/sdX names: with both SATA and USB present the lettering moves.
+LABEL=rootfs	/	ext4	errors=remount-ro	0	1
+proc		/proc	proc	defaults		0	0
+sysfs		/sys	sysfs	defaults		0	0
+LABEL=data	/srv/data	ext4	defaults,noatime,nofail	0	2

@@ -1,0 +1,8 @@
+Drop 8 MiB SPI dumps here (exactly 8388608 bytes). Do not saveenv until verified.
+
+Ways in:
+  TCP 45151  — python3 scripts/spi-recv-daemon.py (running)
+  scp        — scp dump root@192.168.68.250:/root/ds115j/backups/spi/
+  TFTP WRQ   — tftpput … ds115j-spi-8m.bin  →  /srv/tftp/ then:
+               /root/ds115j/scripts/harvest-tftp-spi.sh
+

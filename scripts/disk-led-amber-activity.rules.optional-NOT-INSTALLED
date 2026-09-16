@@ -1,0 +1,15 @@
+# NOT INSTALLED — kept only as a reference.
+#
+# Tried 2026-09-16 11:31 UTC as MUST-11 "disk activity LED" polish, reverted
+# 2026-09-16 ~12:2x UTC at owner request.
+#
+# The DS115j bay LED is bi-color. Only the AMBER half is a Linux gpio-led
+# (synology:amber:disk, MPP31). The GREEN half is driven by the SATA link in
+# hardware and is not visible in /sys/class/leds. Driving amber from
+# disk-activity therefore makes the bay LED blink ORANGE on every I/O and
+# masks the normal GREEN. Owner wants the bay LED GREEN.
+#
+# Amber should stay off (trigger=none, brightness=0) and be reserved for a
+# real fault indication.
+#
+# ACTION=="add", SUBSYSTEM=="leds", KERNEL=="synology:amber:disk", ATTR{trigger}="disk-activity"

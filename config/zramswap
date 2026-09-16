@@ -1,0 +1,8 @@
+# lz4 fastest on low-power ARM
+ALGO=lz4
+
+# 2 GiB logical zram swap (compressed in RAM; 256 MiB physical RAM)
+SIZE=2048
+
+# Higher priority than any future HDD swap
+PRIORITY=100

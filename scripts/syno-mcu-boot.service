@@ -1,0 +1,14 @@
+[Unit]
+Description=DS115j MCU ready state (power LED steady + status LED green steady + one short beep)
+DefaultDependencies=no
+After=systemd-udevd-kernel.socket syno-mcu-boot-begin.service network.target networking.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/syno-mcu-boot.sh ready
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

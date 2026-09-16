@@ -1,0 +1,4 @@
+# DS115j single SATA disk: monitor SMART health, attributes, logs,
+# temperature and scheduled tests. Run the amber LED hook directly;
+# no mailer is configured on this LAN-only appliance.
+/dev/sda -d sat -a -o on -S on -s (S/../.././02|L/../../6/03) -W 4,45,50 -m <nomailer> -M exec /usr/local/sbin/smart-amber-led.sh
