@@ -1,0 +1,3 @@
+# Auto-mount USB block devices to /mnt/usb-<kernel>
+ACTION=="add", KERNEL=="sd[a-z][0-9]", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", RUN+="/usr/local/sbin/usb-automount.sh mount %k"
+ACTION=="remove", KERNEL=="sd[a-z][0-9]", SUBSYSTEM=="block", RUN+="/usr/local/sbin/usb-automount.sh umount %k"
