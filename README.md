@@ -9,7 +9,7 @@ known-good boot artifacts and the complete Debian rootfs payload.
 
 ## Daily-ready scope (2026-09-16)
 
-HDD boot from `ide 0:2`, SSH, DHCP + permanent `.233`, RGMII Ethernet, MCU LEDs/beep, temperature fan, SMART → bay amber only on failure, zram, chrony, `qnap_poweroff_ds115j` PSU cut. Samba/backups/nftables are **out of scope**.
+HDD boot from `ide 0:2`, SSH, DHCP + permanent `.233`, RGMII Ethernet, MCU LEDs/beep, temperature fan, SMART → bay amber only on failure, 10-minute HDD spin-down, zram, chrony, `qnap_poweroff_ds115j` PSU cut. Samba/backups/nftables are **out of scope**.
 
 Live probe: [docs/current-state.md](docs/current-state.md). Cold-boot checklist: [docs/cold-boot-verify.md](docs/cold-boot-verify.md).
 
@@ -49,6 +49,7 @@ docs/landmines.md      never ide 0:1, never casual saveenv, …
 docs/recovery.md       TFTP / sda2 rollback
 docs/led-behaviour.md
 docs/smart-amber-led.md
+docs/disk-idle.md
 docs/current-state.md
 scripts/               MCU, fan, SMART amber, deploy-boot, bootstrap
 dts/                   good DTS/DTB

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Install DS115j daily-ready userspace (network, data, apt, MCU, fan, SMART,
-# zram, chrony, and poweroff module)
+# zram, chrony, HDD idle standby, and poweroff module)
 # onto the running NAS. Run as root from this repo's root:
 #   sh scripts/install-userspace.sh
 #
@@ -30,6 +30,10 @@ for required in \
     config/zramswap \
     config/journald.conf \
     config/smartd.conf \
+    config/smartmontools \
+    config/disk-idle.service \
+    scripts/disk-idle.service \
+    scripts/install-disk-idle.sh \
     config/ds115j-modules.conf \
     config/qnap-poweroff-ds115j.conf \
     modules/qnap-poweroff-ds115j.ko
@@ -68,6 +72,7 @@ apt-get install -y --no-install-recommends \
     isc-dhcp-client \
     kmod \
     smartmontools \
+    hdparm \
     zram-tools
 
 install -m 0755 \
@@ -87,6 +92,7 @@ install -m 0644 \
     "$ROOT/scripts/syno-fan.service" \
     "$ROOT/scripts/smart-amber-led.service" \
     "$ROOT/scripts/smart-amber-led.timer" \
+    "$ROOT/scripts/disk-idle.service" \
     /etc/systemd/system/
 
 backup_once /etc/smartd.conf
@@ -131,6 +137,10 @@ if [ -e /usr/lib/systemd/system/dbus.service ]; then
         /etc/systemd/system/multi-user.target.wants/dbus.service
 fi
 systemctl start dbus.service
+
+# HDD 10-minute idle standby (hdparm, smartd -n standby,q, volatile journal,
+# root noatime/commit=60). Does not restart networking or touch fan/MCU.
+sh "$ROOT/scripts/install-disk-idle.sh"
 
 echo "install-userspace: done"
 echo "Network files are installed; reboot from UART to apply DHCP + eth0:1 safely."

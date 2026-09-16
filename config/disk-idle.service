@@ -1,0 +1,16 @@
+[Unit]
+Description=DS115j HDD idle standby (hdparm -S 120 = 10 minutes)
+Documentation=man:hdparm(8)
+After=multi-user.target
+# Do not Require= multi-user.target (cycle). WantedBy pulls this in; After
+# runs the oneshot once the target has been reached.
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Sets the drive's standby timer only. Do not use -y (immediate sleep) or
+# -B (APM) here: APM parking hammers Load_Cycle_Count on WD Red.
+ExecStart=/usr/sbin/hdparm -S 120 /dev/sda
+
+[Install]
+WantedBy=multi-user.target

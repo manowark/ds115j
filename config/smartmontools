@@ -1,0 +1,10 @@
+# Defaults for smartmontools (/etc/default/smartmontools)
+# POSIX shell fragment. Installed by scripts/install-disk-idle.sh.
+
+# Not needed when smartd already monitors the device.
+#enable_smart="/dev/sda"
+
+# Default smartd poll is 1800s. Use at least 3600s so a 10-minute HDD
+# standby timer can expire between polls. Combined with -n standby,q in
+# smartd.conf, a sleeping disk is left asleep.
+smartd_opts="--interval=3600"

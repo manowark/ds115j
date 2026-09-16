@@ -240,7 +240,7 @@ sh scripts/install-userspace.sh
 ```
 
 `install-userspace.sh` explicitly installs `chrony`, `zram-tools`,
-`smartmontools`, `dbus`, `ifupdown`, the DHCP client, `kmod`, and CA
+`smartmontools`, `hdparm`, `dbus`, `ifupdown`, the DHCP client, `kmod`, and CA
 certificates. It installs trixie/updates/security apt sources, the DHCP +
 `.233` network config and `.link`, creates `/srv/data`, installs the
 `LABEL=data` fstab entry, then installs and enables:
@@ -249,7 +249,8 @@ certificates. It installs trixie/updates/security apt sources, the DHCP +
 |-------|--------|
 | MCU LEDs/beep | `syno-mcu.sh`, `syno-mcu-boot.sh`, two systemd units |
 | Fan | `syno-fan.sh` + `syno-fan.service` (never pwm 0; never unbind `gpio-fan`) |
-| SMART amber | `smart-amber-led.sh` + timer/service + `config/smartd.conf` |
+| SMART amber | `smart-amber-led.sh` + timer/service + `config/smartd.conf` (`-n standby,q`, 1 h timer) |
+| HDD idle | `disk-idle.service` (`hdparm -S 120` = 10 min) via `scripts/install-disk-idle.sh` |
 | Soft poweroff | `modules/qnap-poweroff-ds115j.ko` + `modules-load.d` |
 | Base services | `chrony`, `zramswap`, `smartmontools`, `dbus`, `networking` |
 
@@ -315,6 +316,7 @@ values, do **not** run `saveenv`; continue using §7.
 ```sh
 uname -r                    # 6.12.107+deb13-armmp
 ip -4 addr show dev eth0    # DHCP plus .233 labelled eth0:1
+findmnt /                    # rw,noatime,commit=60 on LABEL=rootfs
 findmnt /srv/data            # source carrying LABEL=data, rw,noatime
 apt-get update               # trixie + updates + security succeed
 chronyc tracking             # Leap status: Normal
@@ -324,6 +326,8 @@ systemctl --failed           # empty
 systemctl is-active networking chrony zramswap smartmontools dbus
 systemctl is-active syno-fan.service syno-mcu-boot-begin.service
 systemctl is-active syno-mcu-boot.service smart-amber-led.timer
+systemctl is-active disk-idle.service
+hdparm -C /dev/sda           # active/idle just after boot; standby after 10+ min quiet
 /usr/local/sbin/syno-mcu.sh ping
 lsmod | grep qnap_poweroff
 test -e /sys/firmware/devicetree/base/gpio-fan/alarm-gpios && echo BAD || echo ABSENT
@@ -344,6 +348,8 @@ front power button afterward.
 
 When every §9 check passes, the NAS is daily-ready: local HDD boot, DHCP plus
 permanent `.233`, `/srv/data`, working trixie apt, SMART monitoring and amber
-fault indication, chrony, zram, MCU boot/ready LEDs and beep, temperature fan
-control, and the soft-poweroff module. The only external requirement after
-rootfs extraction is Internet access for the explicit apt installation.
+fault indication, 10-minute HDD spin-down (`docs/disk-idle.md`), chrony, zram,
+MCU boot/ready LEDs and beep, temperature fan control, and the soft-poweroff
+module. The only external requirement after rootfs extraction is Internet
+access for the explicit apt installation. Journald is volatile (logs gone on
+reboot) so the disk can sleep.

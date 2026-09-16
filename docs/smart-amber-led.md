@@ -20,9 +20,12 @@ smartd calls `/usr/local/sbin/smart-amber-led.sh` immediately through:
 ```
 
 `smart-amber-led.timer` also runs a read-only `smartctl -H -A /dev/sda`
-reconciliation every 15 minutes. This clears amber after the health/attribute
-condition recovers because smartd does not provide a general recovery hook.
-If SMART cannot be read, the script preserves the current LED state.
+reconciliation every hour (`OnUnitActiveSec=1h`). Hourly (not 15 minutes)
+lets a 10-minute `hdparm` standby timer expire; smartd itself uses
+`-n standby,q` and `--interval=3600` so it will not spin a sleeping disk.
+This clears amber after the health/attribute condition recovers because
+smartd does not provide a general recovery hook. If SMART cannot be read,
+the script preserves the current LED state.
 
 ## Installed files
 

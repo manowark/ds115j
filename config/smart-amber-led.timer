@@ -3,7 +3,7 @@ Description=Periodically reconcile DS115j amber disk LED with SMART health
 
 [Timer]
 OnBootSec=2min
-OnUnitActiveSec=15min
+OnUnitActiveSec=1h
 AccuracySec=1min
 Persistent=true
 Unit=smart-amber-led.service
