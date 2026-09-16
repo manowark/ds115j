@@ -23,7 +23,7 @@ usage: syno-mcu.sh power on|blink|off
                  status off|green|green-blink|orange|orange-blink
                  healthy            # blue steady + status green steady
                  alarm              # status orange blink + 3 long beeps
-                 beep short|long    # audible on DS115j (verified)
+                 beep [short|long]  # default=short; audible on DS115j (verified)
                  ping               # no-op: verify script + tty availability
 USAGE
   exit 1
@@ -68,8 +68,7 @@ case "$STAGE" in
              send 063 "long beep 1/3"; sleep 1
              send 063 "long beep 2/3"; sleep 1
              send 063 "long beep 3/3" ;;
-  beep)      [ $# -eq 2 ] || usage
-             case "$2" in
+  beep)      case "${2:-short}" in
                short) send 062 "short beep" ;;
                long)  send 063 "long beep" ;;
                *) usage ;;
