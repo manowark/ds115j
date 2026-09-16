@@ -12,6 +12,10 @@ MNT="/mnt/usb-${DEVICE}"
 
 case "$ACTION" in
   mount)
+    # Idempotent: skip if already mounted
+    if mountpoint -q "$MNT" 2>/dev/null; then
+      exit 0
+    fi
     mkdir -p "$MNT"
     # Try rw first; fall back to ro if device is read-only (e.g. USB-RO switch)
     if mount -o rw,noatime "/dev/${DEVICE}" "$MNT" 2>/dev/null; then

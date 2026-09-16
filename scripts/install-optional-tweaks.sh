@@ -10,28 +10,40 @@ set -e
 
 NAS_IP="${NAS_IP:-192.168.68.233}"
 NAS_USER="${NAS_USER:-root}"
+NAS_PASS="${NAS_PASS:-ds115j}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_DIR="${SCRIPT_DIR}/../config"
 
 usage() {
-  echo "Usage: $0 [wol|sysctl|usb|all]"
+  echo "Usage: NAS_PASS=<pw> $0 [wol|sysctl|usb|all]"
   echo ""
   echo "  wol    — Wake-on-LAN (requires: ethtool)"
   echo "  sysctl — BBR + TCP buffer tuning"
   echo "  usb    — USB auto-mount (udev rule)"
   echo "  all    — install everything"
+  echo ""
+  echo "Env: NAS_IP=${NAS_IP} NAS_USER=${NAS_USER}"
   exit 1
 }
 
 [ $# -eq 0 ] && usage
 
+# Use sshpass when available, fall back to plain ssh
+if command -v sshpass >/dev/null 2>&1; then
+  _ssh="sshpass -p ${NAS_PASS} ssh -o StrictHostKeyChecking=no"
+  _scp="sshpass -p ${NAS_PASS} scp -o StrictHostKeyChecking=no"
+else
+  _ssh="ssh"
+  _scp="scp"
+fi
+
 deploy() {
   local src="$1" dst="$2"
-  scp -q "$src" "${NAS_USER}@${NAS_IP}:${dst}"
+  $_scp -q "$src" "${NAS_USER}@${NAS_IP}:${dst}"
 }
 
 run() {
-  ssh "${NAS_USER}@${NAS_IP}" "$@"
+  $_ssh "${NAS_USER}@${NAS_IP}" "$@"
 }
 
 install_wol() {

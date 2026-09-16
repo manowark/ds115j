@@ -4,7 +4,7 @@ Performance and convenience tweaks for DS115j. **None of these are required** â€
 
 ---
 
-## 4. Wake-on-LAN
+## 1. Wake-on-LAN
 
 Enable Magic Packet wake-up on `eth0`. Allows powering on the NAS remotely from another device.
 
@@ -13,7 +13,7 @@ Enable Magic Packet wake-up on `eth0`. Allows powering on the NAS remotely from 
 ### Install
 
 ```bash
-./install-optional-tweaks.sh wol
+NAS_PASS=<password> ./install-optional-tweaks.sh wol
 ```
 
 ### What it does
@@ -34,19 +34,20 @@ ethtool eth0 | grep Wake-on
 ```bash
 systemctl disable --now wol.service
 rm /etc/systemd/system/wol.service /etc/udev/rules.d/70-wol-eth0.rules
+systemctl daemon-reload
 ethtool -s eth0 wol d
 ```
 
 ---
 
-## 5. Sysctl: BBR + TCP Buffer Tuning
+## 2. Sysctl: BBR + TCP Buffer Tuning
 
 Switches TCP congestion control to BBR and increases buffer sizes for better GbE throughput.
 
 ### Install
 
 ```bash
-./install-optional-tweaks.sh sysctl
+NAS_PASS=<password> ./install-optional-tweaks.sh sysctl
 ```
 
 ### What it does
@@ -72,14 +73,14 @@ sysctl --system   # reverts to kernel defaults
 
 ---
 
-## 8. USB Auto-Mount
+## 3. USB Auto-Mount
 
 Automatically mount USB block devices to `/mnt/usb-<device>` when plugged in.
 
 ### Install
 
 ```bash
-./install-optional-tweaks.sh usb
+NAS_PASS=<password> ./install-optional-tweaks.sh usb
 ```
 
 ### What it does
@@ -88,6 +89,7 @@ Automatically mount USB block devices to `/mnt/usb-<device>` when plugged in.
 - Deploys helper script: `/usr/local/sbin/usb-automount.sh`
 - Mounts to `/mnt/usb-sdX1` (rw, noatime) on plug-in
 - Lazy-unmounts and removes mount point on unplug
+- Idempotent: safe if the same device triggers udev multiple times
 
 ### Verify
 
@@ -111,7 +113,7 @@ udevadm control --reload-rules
 ## Install All
 
 ```bash
-./install-optional-tweaks.sh all
+NAS_PASS=<password> ./install-optional-tweaks.sh all
 ```
 
 ## Hardware Note
