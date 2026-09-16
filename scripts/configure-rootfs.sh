@@ -38,7 +38,8 @@ cat > "$TARGET/etc/hosts" <<'EOF'
 EOF
 
 install -m 0644 "$ROOT/config/fstab" "$TARGET/etc/fstab"
-install -m 0644 "$ROOT/config/interfaces" "$TARGET/etc/network/interfaces"
+install -m 0644 "$ROOT/config/interfaces-bootstrap" \
+    "$TARGET/etc/network/interfaces"
 install -m 0644 "$ROOT/config/sources.list" "$TARGET/etc/apt/sources.list"
 
 cat > "$TARGET/etc/resolv.conf" <<'EOF'
@@ -180,7 +181,8 @@ Debian trixie armhf for Synology DS115j (built off-device).
 Temporary root password: ds115j
 Change it: passwd
 
-eth0 uses DHCP plus permanent 192.168.68.233/22 on label eth0:1.
+First boot uses static 192.168.68.233/22. Run install-userspace.sh to enable
+DHCP plus the permanent .233 address on label eth0:1.
 
 This tree is meant for sda1 on the NAS HDD (U-Boot ide, not scsi).
 See the repository's docs/install-uart.md for the three-part disk layout.

@@ -31,7 +31,8 @@ for required in \
     config/journald.conf \
     config/smartd.conf \
     config/ds115j-modules.conf \
-    config/qnap-poweroff-ds115j.conf
+    config/qnap-poweroff-ds115j.conf \
+    modules/qnap-poweroff-ds115j.ko
 do
     if [ ! -f "$ROOT/$required" ]; then
         echo "missing required kit file: $ROOT/$required" >&2
@@ -96,10 +97,8 @@ install -m 0644 "$ROOT/config/qnap-poweroff-ds115j.conf" \
 install -m 0644 "$ROOT/config/ds115j-modules.conf" \
     /etc/modules-load.d/ds115j.conf
 
-if [ -f "$ROOT/modules/qnap-poweroff-ds115j.ko" ]; then
-    install -m 0644 "$ROOT/modules/qnap-poweroff-ds115j.ko" \
-        "/lib/modules/$KVER/extra/qnap-poweroff-ds115j.ko"
-fi
+install -m 0644 "$ROOT/modules/qnap-poweroff-ds115j.ko" \
+    "/lib/modules/$KVER/extra/qnap-poweroff-ds115j.ko"
 depmod "$KVER"
 if ! modinfo qnap-poweroff-ds115j >/dev/null 2>&1; then
     echo "missing qnap-poweroff-ds115j module for $KVER" >&2

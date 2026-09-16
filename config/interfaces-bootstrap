@@ -1,0 +1,14 @@
+auto lo
+iface lo inet loopback
+
+# First boot only: the split rootfs does not yet contain a DHCP client.
+# install-userspace.sh replaces this with config/interfaces (DHCP + eth0:1).
+auto eth0
+iface eth0 inet static
+	address 192.168.68.233/22
+	gateway 192.168.68.1
+	pre-up /sbin/modprobe marvell
+	pre-up /sbin/modprobe mvmdio
+	pre-up /sbin/modprobe mvneta
+	pre-up /sbin/ip link set dev eth0 address 00:11:32:4d:c3:b8
+	dns-nameservers 192.168.68.1 1.1.1.1

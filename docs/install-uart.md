@@ -54,8 +54,9 @@ You are only going to **type** boot commands. Do not `saveenv`.
 On the Mac, clone this repository and give its LAN interface an address on the
 same `/22`, for example `192.168.68.251/22`. The included network files use
 the live unit's MAC `00:11:32:4d:c3:b8`; for a different chassis, first replace
-that value in both `config/interfaces` and `config/10-ds115j-eth0.link` with
-the new unit's sticker MAC. From the repository root:
+that value in `config/interfaces`, `config/interfaces-bootstrap`, and
+`config/10-ds115j-eth0.link` with the new unit's sticker MAC. From the
+repository root:
 
 ```bash
 scripts/serve-tftp.sh
@@ -111,16 +112,35 @@ If `sda2` is fine, skip to [§5](#5-install-boot-images-on-sda2) after filling `
 
 U-Boot needs **MBR (dos)** and **partition 2 = boot**. Prefer 1 MiB alignment on a blank disk (the live NAS still has historical start-sector 63; do not clone that to a new drive unless you are restoring this exact disk).
 
-Example (BusyBox `fdisk` / `sfdisk`; adjust sizes to the disk). Create an MBR
-partition table in this exact order; `sda3` is the daily data volume:
+Create a 1 MiB-aligned MBR layout with the BusyBox `fdisk` included in the
+recovery ramdisk. This exact input creates 64 GiB root, 128 MiB boot, and data
+using the rest of the disk:
 
-```text
-sda1  64G   type 83   later: mkfs.ext4 -L rootfs /dev/sda1
-sda2  128M  type 83   later: mkfs.ext2 -L boot   /dev/sda2
-sda3  rest  type 83   later: mkfs.ext4 -L data   /dev/sda3
+```sh
+fdisk /dev/sda <<'EOF'
+o
+n
+p
+1
+2048
++64G
+n
+p
+2
+
++128M
+n
+p
+3
+
+
+w
+EOF
+fdisk -l /dev/sda
 ```
 
-Then:
+Before formatting, verify the listing shows `sda1` starting at sector `2048`,
+`sda2` as partition 2 with 128 MiB, and `sda3` consuming the remainder. Then:
 
 ```sh
 mkfs.ext4 -L rootfs /dev/sda1
@@ -139,7 +159,10 @@ python3 -m http.server 45152 --bind 0.0.0.0 --directory "$PWD"
 ```
 
 The reconstruction script verifies SHA-256
-`9d869bf8f45f6f3908097aece847bb2d1bde4a6213801cb8460cdb83f9a30eb6`.
+`9d869bf8f45f6f3908097aece847bb2d1bde4a6213801cb8460cdb83f9a30eb6`
+and also creates `ds115j-install-kit.tar.gz`. Run HTTP in a second laptop
+terminal (or stop TFTP after recovery has booted); keep UART in its own
+terminal.
 Then, from recovery:
 
 ```sh
@@ -149,7 +172,7 @@ wget -O /tmp/rootfs.tgz http://192.168.68.251:45152/rootfs-trixie-armhf.tar.gz
 tar -C /mnt -xzf /tmp/rootfs.tgz
 mkdir -p /mnt/etc/network /mnt/etc/systemd/network /mnt/etc/apt /mnt/srv/data
 wget -O /mnt/etc/network/interfaces \
-  http://192.168.68.251:45152/config/interfaces
+  http://192.168.68.251:45152/config/interfaces-bootstrap
 wget -O /mnt/etc/systemd/network/10-ds115j-eth0.link \
   http://192.168.68.251:45152/config/10-ds115j-eth0.link
 wget -O /mnt/etc/fstab \
@@ -160,9 +183,10 @@ sync
 umount /mnt
 ```
 
-Those four files provide DHCP on `eth0`, permanent `192.168.68.233/22` labelled
-`eth0:1`, stable MAC naming, `LABEL=data` at `/srv/data`, and Debian trixie,
-updates, and security repositories. There is deliberately no
+Those four files provide static `.233` for the first boot (the rootfs does not
+yet have a DHCP client), stable MAC naming, `LABEL=data` at `/srv/data`, and
+Debian trixie, updates, and security repositories. The installer in §6 adds
+DHCP while retaining `.233` as `eth0:1`; there is deliberately no
 `auto eth0:1 inet static` stanza.
 
 The shipped rootfs already includes the
@@ -203,8 +227,8 @@ bootm 0x01000000 0x02000000
 ```
 
 Log in on UART as `root` / `ds115j`. Wait for the one-time Debian second stage
-to finish, confirm Internet works, download this repository directly, and run
-the installer:
+to finish, confirm Internet works, fetch the version-matched kit from the
+laptop HTTP server, and run the installer:
 
 ```sh
 while [ ! -e /etc/ds115j-second-stage-done ]; do
@@ -216,10 +240,11 @@ while [ ! -e /etc/ds115j-second-stage-done ]; do
 done
 ping -c 3 deb.debian.org
 cd /root
-wget -O ds115j-main.tar.gz \
-  https://github.com/manowark/ds115j/archive/refs/heads/main.tar.gz
-tar -xzf ds115j-main.tar.gz
-cd ds115j-main
+wget -O ds115j-install-kit.tar.gz \
+  http://192.168.68.251:45152/ds115j-install-kit.tar.gz
+mkdir -p ds115j-kit
+tar -C ds115j-kit -xzf ds115j-install-kit.tar.gz
+cd ds115j-kit
 sh scripts/install-userspace.sh
 ```
 
@@ -269,11 +294,17 @@ area. A bad write can brick the NAS. Keep UART attached throughout.
 
 Before the one permitted `saveenv`, make a **board-specific** 8 MiB dump:
 
-1. Run `sh scripts/dump-spi-linux.sh` on the NAS.
-2. Copy `/tmp/ds115j-spi-8m.bin` into this clone under `firmware/spi/` with a
-   unique chassis/date name.
-3. Verify `wc -c` reports exactly `8388608`, run `sha256sum`, save the matching
-   `.sha256` file in `firmware/spi/`, and copy both files off the NAS.
+1. On the laptop, from this repository, run `scripts/recv-spi.sh` and leave it
+   listening on TCP 45151.
+2. On the NAS run
+   `RECEIVER=192.168.68.251 sh /root/ds115j-kit/scripts/dump-spi-linux.sh`.
+3. The receiver verifies the size and writes the dump under `backups/spi/`.
+   Copy that `.bin` into `firmware/spi/` with a unique chassis/date name, then
+   from `firmware/spi/` run
+   `sha256sum UNIQUE-NAME.bin > UNIQUE-NAME.bin.sha256` followed by
+   `sha256sum -c UNIQUE-NAME.bin.sha256`. Keep both files in the repository
+   and another copy outside the NAS; `wc -c UNIQUE-NAME.bin` must report
+   exactly `8388608`.
 4. Reboot with UART, type the §7 commands, and confirm they boot successfully.
 5. At the next `Marvell>>` prompt, inspect `printenv bootargs bootcmd`. Only
    then set the exact values proven by the live DS115j:
@@ -306,7 +337,10 @@ systemctl is-active syno-mcu-boot.service smart-amber-led.timer
 lsmod | grep qnap_poweroff
 test -e /sys/firmware/devicetree/base/gpio-fan/alarm-gpios && echo BAD || echo ABSENT
 test "$(cat /sys/class/leds/synology:amber:disk/brightness)" = 0
-test "$(cat /sys/class/hwmon/hwmon1/pwm1)" -gt 0
+PWM=$(for p in /sys/class/hwmon/hwmon*/pwm1; do
+  [ -e "$p" ] && [ -e "${p%/*}/fan1_target" ] && { echo "$p"; break; }
+done)
+test -n "$PWM" && test "$(cat "$PWM")" -gt 0
 ```
 
 The ready state is: blue power steady, status green steady after one short
