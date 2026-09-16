@@ -234,7 +234,7 @@ certificates. It installs trixie/updates/security apt sources, the DHCP +
 | MCU LEDs/beep | `syno-mcu.sh`, `syno-mcu-boot.sh`, two systemd units |
 | Fan | `syno-fan.sh` + `syno-fan.service` (never pwm 0; never unbind `gpio-fan`) |
 | SMART amber | `smart-amber-led.sh` + timer/service + `config/smartd.conf` |
-| Soft poweroff | matching bundled rootfs module + `modules-load.d` |
+| Soft poweroff | `modules/qnap-poweroff-ds115j.ko` + `modules-load.d` |
 | Base services | `chrony`, `zramswap`, `smartmontools`, `dbus`, `networking` |
 
 The installer never restarts networking, so it does not drop the current UART
