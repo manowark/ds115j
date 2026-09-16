@@ -2,7 +2,8 @@
 # Listen on TCP 45151 and write one dump into backups/spi.
 # Prefer spi-recv-daemon.py for repeated dumps.
 set -euo pipefail
-OUTDIR=/root/ds115j/backups/spi
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+OUTDIR=${OUTDIR:-$ROOT/backups/spi}
 mkdir -p "$OUTDIR"
 STAMP=$(date +%Y%m%d-%H%M%S)
 OUT=$OUTDIR/ds115j-spi-8m-$STAMP.bin
@@ -10,7 +11,7 @@ EXPECT=8388608
 PORT=45151
 
 echo "Listening on 0.0.0.0:$PORT -> $OUT"
-echo "NAS: nc -w 30 192.168.68.250 $PORT < /tmp/ds115j-spi-8m.bin"
+echo "NAS: RECEIVER=<laptop-ip> scripts/dump-spi-linux.sh"
 
 python3 - "$PORT" "$OUT" <<'PY'
 import socket, sys
@@ -36,5 +37,4 @@ if [ "$SIZE" -ne "$EXPECT" ]; then
     exit 1
 fi
 ln -sfn "$(basename "$OUT")" "$OUTDIR/ds115j-spi-8m.bin"
-ln -sfn "$(basename "$OUT")" /root/ds115j/spi-dumps/ds115j-spi-8m.bin 2>/dev/null || true
 echo "OK. Canonical: $OUTDIR/ds115j-spi-8m.bin"

@@ -1,13 +1,13 @@
 #!/bin/bash
 # Overlay hostname, fstab, network, serial getty, ssh, and kernel modules
-# into the helper-side armhf rootfs. Safe to re-run. Does not touch the NAS.
+# into a locally built armhf rootfs. Safe to re-run. Does not touch the NAS.
 set -euo pipefail
 
-ROOT=/root/ds115j
-TARGET=$ROOT/rootfs
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+TARGET=${TARGET:-$ROOT/rootfs-build}
 export TARGET
 KVER=6.12.107+deb13-armmp
-MODSRC=$ROOT/kernel/usr/lib/modules/$KVER
+MODSRC=${MODSRC:-$ROOT/kernel/usr/lib/modules/$KVER}
 ROOT_HASH='$6$ds115j$8thWTncFzUFWIKn749shWZByOQahw6JQz8VV/A0F1f5V.1y/CInssbonl7xQ0nFWyeJdSieGu6cLOOuSO0.UV0'
 
 if [ ! -d "$TARGET/etc" ]; then
@@ -159,7 +159,7 @@ PY
 fi
 
 # SSH host key files are architecture-independent. Generate them with the
-# helper's ssh-keygen because armhf package postinst scripts did not run.
+# host ssh-keygen because armhf package postinst scripts did not run.
 # Use -A -f PREFIX (no chroot) so we never depend on TARGET/dev/null.
 if command -v ssh-keygen >/dev/null; then
     ssh-keygen -A -f "$TARGET"
@@ -168,15 +168,7 @@ fi
 # Kernel + HDD initramfs for later local U-Boot load (ide, not scsi).
 install -d "$TARGET/boot"
 for img in uImage-ds115j uRamdisk-hdd-ds115j; do
-    src=
-    if [ -f "/srv/tftp/$img" ]; then
-        src=/srv/tftp/$img
-    elif [ -f "$ROOT/kernel/$img" ]; then
-        src=$ROOT/kernel/$img
-    fi
-    if [ -n "$src" ]; then
-        install -m 0644 "$src" "$TARGET/boot/$img"
-    fi
+    install -m 0644 "$ROOT/boot/$img" "$TARGET/boot/$img"
 done
 
 if [ -d "$MODSRC" ]; then
@@ -206,22 +198,20 @@ ext4
 EOF
 
 cat > "$TARGET/root/README-ds115j.txt" <<'EOF'
-Debian trixie armhf for Synology DS115j (built on helper, not on the NAS).
+Debian trixie armhf for Synology DS115j (built off-device).
 
 Temporary root password: ds115j
 Change it: passwd
 
-eth0 is static 192.168.68.233/22, gateway 192.168.68.1, helper 192.168.68.250.
+eth0 is static 192.168.68.233/22, gateway 192.168.68.1.
 
-This tree is meant for the NAS HDD (U-Boot ide, not scsi):
-  one ext4 partition labelled rootfs
-  tarball: /root/ds115j/rootfs-trixie-armhf.tar.gz
-  extract: /root/ds115j/scripts/extract-hdd.sh on the ramdisk
+This tree is meant for sda1 on the NAS HDD (U-Boot ide, not scsi).
+See the repository's docs/install-uart.md for the three-part disk layout.
 
 Kernel cmdline (U-Boot, do not saveenv until SPI is dumped):
   console=ttyS0,115200 root=LABEL=rootfs rootwait rw
 
-Do not flash SPI. Do not run saveenv until an 8 MiB dump lives on the helper.
+Do not flash SPI. Do not run saveenv until an 8 MiB dump is safely copied off-device.
 EOF
 
 echo "configure-rootfs: done"

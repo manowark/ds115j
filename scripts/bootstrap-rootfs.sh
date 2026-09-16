@@ -1,15 +1,13 @@
 #!/bin/bash
-# Build a Debian trixie armhf rootfs on the helper only.
+# Build a Debian trixie armhf rootfs from Debian mirrors on a Linux laptop.
 # Does not talk to the NAS, does not flash, does not saveenv.
 #
-# This helper is aarch64 with 16 KiB pages. Native armhf (4 KiB ELF)
-# segfaults, so we must NOT chroot into the guest. mmdebstrap
-# --mode=chrootless unpacks .debs without running armhf maintainer scripts.
+# Chrootless mode does not execute armhf binaries on the host.
 # Remaining dpkg --configure -a happens on first boot on the NAS (4 KiB).
 set -euo pipefail
 
-ROOT=/root/ds115j
-TARGET=$ROOT/rootfs
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+TARGET=${TARGET:-$ROOT/rootfs-build}
 DIST=trixie
 ARCH=armhf
 MIRROR=${MIRROR:-http://deb.debian.org/debian}
@@ -66,7 +64,7 @@ chmod 0755 "$TARGET/usr/local/libexec/ds115j-second-stage.sh"
 
 cat > "$TARGET/etc/systemd/system/ds115j-second-stage.service" <<'EOF'
 [Unit]
-Description=Finish Debian package configure on DS115j (helper was 16K-page)
+Description=Finish Debian package configuration on DS115j
 Wants=network-online.target
 After=local-fs.target network-online.target
 
@@ -85,4 +83,4 @@ ln -sfn /etc/systemd/system/ds115j-second-stage.service \
 
 echo "=== $(date -Is) bootstrap-rootfs done ==="
 du -sh "$TARGET"
-echo "Copy this tree onto a USB ext4 filesystem labelled rootfs. See next-stage-boot.md."
+echo "Rootfs built at $TARGET. See docs/install-uart.md."

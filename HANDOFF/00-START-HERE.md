@@ -1,5 +1,10 @@
 # 00 — START HERE (DS115j Debian handoff on helper `.250`)
 
+> Archived helper-era entry point. Do not use its helper paths or service
+> commands. Current self-contained instructions are
+> [`../docs/install-uart.md`](../docs/install-uart.md); all artifacts are in
+> this clone and laptop TFTP is `scripts/serve-tftp.sh`.
+
 You are continuing a **Synology DS115j → Debian 13 (trixie armhf)** conversion. Hardware enablement, local HDD boot, and MUST-1…12 daily-NAS gates are **in place** (MUST-8 skipped by owner). Remaining work is backup/restore drill and burn-in — not re-doing udev or networking.
 
 This package lives **on the helper**, not only in a Cursor store:

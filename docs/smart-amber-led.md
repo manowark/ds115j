@@ -43,7 +43,7 @@ scripts/smart-amber-led.timer
 config/smartd.conf
 ```
 
-Helper still has the same files under `/root/ds115j/scripts/`.
+Canonical copies are in this repository's `scripts/` and `config/` directories.
 
 ## Safe owner verification
 

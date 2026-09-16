@@ -1,9 +1,9 @@
 #!/bin/sh
-# Run ON the NAS (stock DSM or Debian). Helper only stores a copy of this file.
+# Run ON the NAS (stock DSM or Debian).
 # Dumps the 8 MiB SPI NOR. Does not write flash. Does not saveenv.
 set -eu
 
-HELPER=192.168.68.250
+RECEIVER=${RECEIVER:-192.168.68.251}
 PORT=45151
 OUT=/tmp/ds115j-spi-8m.bin
 EXPECT=8388608
@@ -53,10 +53,10 @@ if [ "$SIZE" -ne "$EXPECT" ]; then
     echo "WARNING: not 8 MiB. Check /proc/mtd; do not saveenv."
 fi
 
-echo "Sending to helper $HELPER:$PORT -> /root/ds115j/backups/spi/"
-echo "(helper: spi-recv-daemon.py or recv-spi.sh must be listening)"
+echo "Sending to laptop $RECEIVER:$PORT"
+echo "(run scripts/spi-recv-daemon.py or scripts/recv-spi.sh in this repo)"
 if command -v nc >/dev/null 2>&1; then
-    nc -w 30 "$HELPER" "$PORT" < "$OUT" || busybox nc -w 30 "$HELPER" "$PORT" < "$OUT"
+    nc -w 30 "$RECEIVER" "$PORT" < "$OUT" || busybox nc -w 30 "$RECEIVER" "$PORT" < "$OUT"
 else
     echo "No nc. Copy $OUT off the NAS another way (scp, USB)."
     exit 2

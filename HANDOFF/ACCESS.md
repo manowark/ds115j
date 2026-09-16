@@ -1,5 +1,9 @@
 # ACCESS — NAS, helper, UART, services
 
+> Historical snapshot only. The helper is optional and may no longer exist.
+> Use [`../docs/access.md`](../docs/access.md), serve TFTP from the laptop with
+> `scripts/serve-tftp.sh`, and obtain every artifact from this Git clone.
+
 Trusted LAN only. Do not publish these details off-LAN.
 
 ## Systems

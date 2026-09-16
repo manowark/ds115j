@@ -7,11 +7,9 @@
 # Wipes /dev/sda and extracts Debian. Does not flash SPI. Does not saveenv.
 set -eu
 
-HELPER=192.168.68.250
-HTTP=45152
 DISK=/dev/sda
 MNT=/mnt
-TARBALL=rootfs-trixie-armhf.tar.gz
+TARBALL=${1:-/tmp/rootfs-trixie-armhf.tar.gz}
 
 echo "=== DS115j HDD extract ==="
 echo "DESTROYS all data on $DISK. Run only after backups/spi has 8388608 bytes."
@@ -41,9 +39,11 @@ mkdir -p "$MNT"
 umount "$MNT" 2>/dev/null || true
 mount "$part" "$MNT"
 
-echo "wget http://$HELPER:$HTTP/$TARBALL"
-wget -O /tmp/$TARBALL "http://$HELPER:$HTTP/$TARBALL"
-tar -C "$MNT" -xzf /tmp/$TARBALL
+[ -f "$TARBALL" ] || {
+    echo "Missing $TARBALL. Reconstruct it from this repository first." >&2
+    exit 1
+}
+tar -C "$MNT" -xzf "$TARBALL"
 sync
 echo "Extracted onto $part LABEL=rootfs"
 ls "$MNT"

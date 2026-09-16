@@ -1,8 +1,9 @@
 #!/bin/bash
-# Move a TFTP WRQ dump from /srv/tftp into backups/spi after U-Boot tftpput.
+# Move a TFTP WRQ dump into this repository after U-Boot tftpput.
 set -euo pipefail
-SRC=${1:-/srv/tftp/ds115j-spi-8m.bin}
-DIR=/root/ds115j/backups/spi
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+SRC=${1:-$ROOT/.tftp-root/ds115j-spi-8m.bin}
+DIR=${OUTDIR:-$ROOT/backups/spi}
 EXPECT=8388608
 mkdir -p "$DIR"
 [ -f "$SRC" ] || { echo "no $SRC"; exit 1; }

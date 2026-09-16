@@ -15,7 +15,7 @@ Read [landmines.md](landmines.md) first. Recovery-only (already Debian, just won
 UART:   115200 8N1   (Mac: screen /dev/cu.usbserial-BG01OOBA 115200)
         Console is UART0 / ttyS0. UART1 / ttyS1 is the PIC MCU — leave it alone.
 NAS IP: 192.168.68.233/22     netmask 255.255.252.0     gateway 192.168.68.1
-Helper: 192.168.68.250        TFTP UDP/69  files in /srv/tftp
+Laptop: example 192.168.68.251/22   serves files from this repository
 Password (LAN): ds115j
 ```
 
@@ -45,15 +45,21 @@ Marvell>> printenv bootcmd
 
 You are only going to **type** boot commands. Do not `saveenv`.
 
-## 2. TFTP the kernel (helper or laptop)
+## 2. Serve and TFTP the kernel from the laptop
 
-### From the helper (usual)
+On the Mac, clone this repository and give its LAN interface an address on the
+same `/22`, for example `192.168.68.251/22`. From the repository root:
 
-Helper must have `tftpd-hpa` serving `/srv/tftp` (copy `boot/*` there if needed).
+```bash
+scripts/serve-tftp.sh
+```
+
+This stages and serves the three known-good files from `boot/` using macOS
+`/usr/libexec/tftpd`. It prompts for `sudo` because TFTP uses UDP/69. In U-Boot:
 
 ```text
 Marvell>> setenv ipaddr 192.168.68.233
-Marvell>> setenv serverip 192.168.68.250
+Marvell>> setenv serverip 192.168.68.251
 Marvell>> setenv netmask 255.255.252.0
 Marvell>> tftpboot 0x01000000 uImage-ds115j
 Marvell>> tftpboot 0x02000000 uRamdisk-recovery-ds115j
@@ -63,13 +69,6 @@ Marvell>> bootm 0x01000000 0x02000000
 Use `uRamdisk-hdd-ds115j` instead of recovery **only** when `sda1` already has a working Debian root (`LABEL=rootfs`).
 
 Do not boot `uImage-nodtb`.
-
-### From the laptop (no helper)
-
-1. Put this repo’s `boot/uImage-ds115j` and `boot/uRamdisk-recovery-ds115j` in a TFTP root.
-2. Give the laptop a static address on the same `/22`, e.g. `192.168.68.251/22`.
-3. Run a TFTP server that serves those filenames at the TFTP root (macOS `tftpd`, `tftpd-hpa`, or any LAN TFTP daemon).
-4. In U-Boot: `setenv serverip 192.168.68.251` (laptop) and the same `tftpboot` / `bootm` as above.
 
 ## 3. Partition the disk
 
@@ -123,18 +122,22 @@ mkfs.ext4 -L data   /dev/sda3
 
 ## 4. Install Debian userspace onto `sda1`
 
-The GitHub repo **does not** contain `rootfs-trixie-armhf.tar.gz` (~134 MiB, over GitHub’s file limit). You need one of:
+The complete rootfs is in Git as two files below 95 MB. On the laptop,
+reconstruct it and serve the repository over HTTP:
 
-- Helper HTTP (if running): `http://192.168.68.250:45152/rootfs-trixie-armhf.tar.gz`
-- Rebuild on the helper: `scripts/bootstrap-rootfs.sh` then pack `rootfs/`
-- On a machine that can run `mmdebstrap --arch=armhf` (see that script). First boot still needs **Internet** for `dpkg --configure -a` / apt.
+```bash
+scripts/reconstruct-rootfs.sh
+python3 -m http.server 45152 --bind 0.0.0.0 --directory "$PWD"
+```
 
-Example from recovery (helper HTTP):
+The reconstruction script verifies SHA-256
+`9d869bf8f45f6f3908097aece847bb2d1bde4a6213801cb8460cdb83f9a30eb6`.
+Then, from recovery:
 
 ```sh
 mkdir -p /mnt
 mount /dev/sda1 /mnt
-wget -O /tmp/rootfs.tgz http://192.168.68.250:45152/rootfs-trixie-armhf.tar.gz
+wget -O /tmp/rootfs.tgz http://192.168.68.251:45152/rootfs-trixie-armhf.tar.gz
 tar -C /mnt -xzf /tmp/rootfs.tgz
 # overlay this kit's config (network, fstab) — see config/
 cp /path/to/kit/config/fstab /mnt/etc/fstab
@@ -143,7 +146,10 @@ sync
 umount /mnt
 ```
 
-`scripts/configure-rootfs.sh` is the helper-side overlay (hostname `ds115j`, serial getty, SSH, root hash for password `ds115j`). `scripts/fix-hdd-root.sh` can be copied into the recovery ramdisk and run as `fix-hdd-root.sh /mnt` if SSH/network/login are wrong.
+`scripts/configure-rootfs.sh` is the off-device rootfs overlay (hostname
+`ds115j`, serial getty, SSH, root hash for password `ds115j`).
+`scripts/fix-hdd-root.sh` can be copied into the recovery ramdisk and run as
+`fix-hdd-root.sh /mnt` if SSH/network/login are wrong.
 
 **MAC:** live unit is `00:11:32:4d:c3:b8`. On a **new** chassis, put **that unit’s** sticker MAC into `config/interfaces` and `config/10-ds115j-eth0.link` — do not clone the old MAC onto two boxes.
 
@@ -170,7 +176,7 @@ mkdir -p /mnt/boot
 mount /dev/sda2 /mnt
 mkdir -p /mnt/boot
 # copy uImage-ds115j and uRamdisk-hdd-ds115j into /mnt/boot
-# (tftp -g from helper, or wget from laptop HTTP)
+# fetch from the laptop TFTP/HTTP server or copy from the cloned repository
 sha256sum /mnt/boot/uImage-ds115j /mnt/boot/uRamdisk-hdd-ds115j
 sync
 umount /mnt
@@ -243,6 +249,7 @@ Keep a verified **8388608-byte** dump. This repo has `firmware/spi/ds115j-spi-8m
 ## Gaps
 
 - Full debootstrap / first `apt-get` needs **Internet on the NAS**.
-- Rootfs tarball is not in git (size). Use helper HTTP or `scripts/bootstrap-rootfs.sh`.
+- Rootfs extraction itself is offline after cloning; first-boot package
+  configuration still needs Internet.
 - Kernel module tree is not in git; match vermagic `6.12.107+deb13-armmp`.
 - Stock U-Boot `bootcmd` on a brand-new DSM box will not load Debian until you either type the `ext2load ide 0:2` sequence each boot or perform a **separately reviewed** env change (SPI landmine).

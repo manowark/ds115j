@@ -1,5 +1,8 @@
 # RECOVERY-RUNBOOK — DS115j (operator + next-AI)
 
+> Historical copy. Use [`../docs/recovery.md`](../docs/recovery.md), which
+> serves repository artifacts from the laptop and has no helper dependency.
+
 Goal: **restore bootability or get back onto the running system** using U-Boot + local `ide 0:2` and/or helper TFTP, **without ever** probing `ide 0:1`, writing SPI (`sf`/`saveenv`/`bubt`/`fw_setenv`), or reformatting. Last resort vs. bricking: keep U-Boot env untouched, boot from known-good images.
 
 ## Access (full: ACCESS.md)

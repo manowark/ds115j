@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Accept SPI dumps on TCP 45151 into /root/ds115j/backups/spi/.
+"""Accept SPI dumps on TCP 45151 into this repository's backups/spi/.
 
 One connection = one file. Stays up for further dumps. Does not write NAS flash.
 """
@@ -10,7 +10,10 @@ import os
 import socket
 import time
 
-DIR = "/root/ds115j/backups/spi"
+DIR = os.environ.get(
+    "OUTDIR",
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "backups", "spi"),
+)
 PORT = 45151
 EXPECT = 8388608
 

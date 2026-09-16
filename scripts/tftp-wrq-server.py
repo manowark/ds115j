@@ -21,7 +21,14 @@ BLK = 512
 
 def main() -> int:
     p = argparse.ArgumentParser()
-    p.add_argument("--dir", default="/root/ds115j/spi-dumps")
+    p.add_argument(
+        "--dir",
+        default=os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "backups",
+            "spi",
+        ),
+    )
     p.add_argument("--port", type=int, default=69)
     p.add_argument("--expect", type=int, default=8388608)
     args = p.parse_args()

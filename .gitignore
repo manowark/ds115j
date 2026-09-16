@@ -3,5 +3,7 @@
 *~
 node_modules/
 linux/
-rootfs/
+/rootfs-build/
 rootfs-trixie-armhf.tar.gz
+/.tftp-root/
+/backups/

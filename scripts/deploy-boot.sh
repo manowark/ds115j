@@ -1,6 +1,6 @@
 #!/bin/bash
 # deploy-boot.sh — versioned boot-image install / rollback on sda2.
-# Run ON the NAS as root. Canonical copy: helper /root/ds115j/scripts/deploy-boot.sh
+# Run ON the NAS as root. Canonical copy is this repository.
 #
 # Deploys the uImage + HDD-initramfs pair as one set, keeps a rolling
 # previous-image history on sda2, read-back-verifies hashes BEFORE umount,
@@ -154,7 +154,7 @@ if [ "$ACTION" = prev ]; then
   [ "$ok" = 1 ] || die "rollback read-back mismatch"
   printf 'rollback OK -> %s + %s (sync)\n' "$(basename "$K_PREV")" "$(basename "$R_PREV")"
   sync
-  echo "NOTE: rollback is device-local; helper /srv/tftp canonical pair unchanged."
+  echo "NOTE: rollback is device-local; repository boot images are unchanged."
   echo "NOTE: files only — reboot separately with UART. Newest uImage .pre-* may be the alarm-gpios kernel."
   list
   exit 0

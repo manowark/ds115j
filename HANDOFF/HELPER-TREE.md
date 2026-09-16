@@ -1,5 +1,9 @@
 # HELPER-TREE — `/root/ds115j` and `/srv/tftp`
 
+> Historical inventory only. Nothing here is required or authoritative for a
+> reinstall. The Git repository now contains the rootfs parts and all supported
+> boot/config/module artifacts.
+
 Inventory **2026-09-15 19:51 UTC** on helper hostname `rpi` (`192.168.68.250`). HANDOFF copies are under `/root/ds115j/HANDOFF/artifacts/` (see `artifacts/MANIFEST.txt`).
 
 This helper is **not a git repo**. Nested `linux/` is dirty and only a DTS/dtc aid.

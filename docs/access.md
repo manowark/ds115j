@@ -1,4 +1,4 @@
-# ACCESS — NAS, helper, UART, services
+# ACCESS — NAS, laptop, UART, services
 
 Trusted LAN only. Do not publish these details off-LAN.
 
@@ -8,7 +8,7 @@ Trusted LAN only. Do not publish these details off-LAN.
 |---|---|---|
 | **NAS (Debian)** | `ds115j` **`192.168.68.233/22`** | `ssh root@192.168.68.233` password **`ds115j`** |
 | NAS DHCP (when lease exists) | historically **`192.168.68.62/22`** | same credentials; **as of 2026-09-15 19:50 UTC the lease had expired and `.62` was gone** |
-| **Helper (this Pi)** | hostname `rpi` **`192.168.68.250/22`** | `ssh root@192.168.68.250` password **`ds115j`** (keys still work); project tree `/root/ds115j` |
+| **Laptop (operator-chosen)** | example **`192.168.68.251/22`** | cloned repository; TFTP via `scripts/serve-tftp.sh` |
 | Gateway / DNS | **`192.168.68.1`** | default route; DNS also `1.1.1.1` |
 | NAS MAC | **`00:11:32:4d:c3:b8`** | pinned by `.link` + ifupdown `pre-up` |
 | Netmask | `255.255.252.0` (`/22`) | |
@@ -30,7 +30,7 @@ screen /dev/cu.usbserial-BG01OOBA 115200
 
 ```text
 NAS ipaddr:     192.168.68.233
-Helper serverip:192.168.68.250
+Laptop serverip:192.168.68.251
 Netmask:        255.255.252.0
 Gateway:        192.168.68.1
 Kernel load:    0x01000000
@@ -54,7 +54,7 @@ console=ttyS0,115200 earlyprintk root=LABEL=rootfs rootwait rw panic=10
 
 **NEVER** `ext2ls` / `ext2load` / probe **`ide 0:1`**. This U-Boot hangs. Use **`ide 0:2` only**. Disk command is **`ide`**, not `scsi`.
 
-Historical TFTP recovery (helper must be up):
+Laptop TFTP recovery (`scripts/serve-tftp.sh` must be running):
 
 ```text
 tftpboot 0x01000000 uImage-ds115j
@@ -63,26 +63,24 @@ tftpboot 0x02000000 uRamdisk-hdd-ds115j      # HDD root
 bootm 0x01000000 0x02000000
 ```
 
-Do not boot `/srv/tftp/uImage-nodtb` (no appended DTB).
+Only serve the repository's `boot/` files. Do not boot an old `uImage-nodtb`
+(no appended DTB).
 
-## Helper services (verified listening 2026-09-15)
+## Laptop services
 
-| Port | Service | State |
+| Port | Service | Start from repository root |
 |---|---|---|
-| TCP 22 | `sshd` | listening IPv4/IPv6 |
-| UDP **69** | `tftpd-hpa` (`in.tftpd`), root `/srv/tftp` | **active**, enabled |
-| TCP **45151** | `python3 /root/ds115j/scripts/spi-recv-daemon.py` | listening |
-| TCP **45152** | `python3 -m http.server 45152 --bind 0.0.0.0 --directory /root/ds115j` | listening |
+| UDP **69** | macOS `tftpd` / Linux `tftpd-hpa` | `scripts/serve-tftp.sh` |
+| TCP **45151** | SPI dump receiver | `python3 scripts/spi-recv-daemon.py` |
+| TCP **45152** | rootfs HTTP | reconstruct first, then `python3 -m http.server 45152 --bind 0.0.0.0 --directory "$PWD"` |
 
-Historical URLs:
+No DHCP/PXE/NFS server is part of the repository setup.
 
-```text
-SPI dump sink:  nc -w 60 192.168.68.250 45151 < ds115j-spi-8m.bin
-Rootfs HTTP:    http://192.168.68.250:45152/rootfs-trixie-armhf.tar.gz
-TFTP:           192.168.68.250:69
-```
+## Historical helper
 
-No DHCP/PXE/NFS server is part of this helper setup.
+The former Raspberry Pi at `192.168.68.250` was used during bring-up. It is
+optional and may be deleted. No installation, recovery, artifact, or script in
+this repository requires it.
 
 ## Disk identifiers (do not reformat)
 
@@ -101,5 +99,4 @@ Only **sshd :22** (IPv4 and IPv6). No Samba/NFS yet.
 ## Password handling
 
 - NAS root password **`ds115j`** is the working credential.
-- Helper SSH (enabled 2026-09-15): `ssh root@192.168.68.250` password **`ds115j`**. Root was locked (`passwd -S` = `L`, shadow `*`); password was **newly set** to `ds115j`. `PermitRootLogin yes`, `PasswordAuthentication yes`, `PubkeyAuthentication yes` via `/etc/ssh/sshd_config.d/99-root-password.conf`. Do not disable key auth.
-- Do not print these LAN passwords in public tickets. They are repeated here because the next AI must actually log in.
+- Do not print the LAN password in public tickets.

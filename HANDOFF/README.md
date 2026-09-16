@@ -1,9 +1,19 @@
-# HANDOFF (curated copy from helper `192.168.68.250:/root/ds115j/HANDOFF`)
+# HANDOFF (historical bring-up notes)
 
 **Human start:** [`../docs/install-uart.md`](../docs/install-uart.md) and [`../README.md`](../README.md).
 
-This folder keeps the helper’s essential markdown (access, landmines, recovery, current state, MUST audit). Binaries live in `../boot`, `../dts`, `../firmware/spi`, `../modules` (current good only — not the stale TFTP snapshots).
+These files preserve the 2026-09-15/16 bring-up record. References to the
+former Raspberry Pi helper, `/root/ds115j`, and `/srv/tftp` describe history,
+not prerequisites or current sources of artifacts.
+
+For all installation and recovery operations use this clone:
+
+- rootfs: `../rootfs/` + `../scripts/reconstruct-rootfs.sh`
+- laptop TFTP: `../scripts/serve-tftp.sh`
+- boot/DTS/SPI/module artifacts: the corresponding top-level directories
+- current access instructions: `../docs/access.md`
 
 `project-context/` (Cursor store dump) and extra historical uImages were **omitted** from git.
 
-**Read first (helper-era):** [`00-START-HERE.md`](00-START-HERE.md)
+Do not follow helper-era copy/fetch commands in the historical notes. Start
+with [`../docs/install-uart.md`](../docs/install-uart.md).

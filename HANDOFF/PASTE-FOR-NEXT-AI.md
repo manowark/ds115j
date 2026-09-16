@@ -1,5 +1,9 @@
 # PASTE-FOR-NEXT-AI — self-contained kickoff
 
+> Archived prompt. It is not self-contained by current standards because it
+> assumes the former helper. Do not reuse it. Use the repository README and
+> `docs/install-uart.md`; the rootfs is in `rootfs/`.
+
 Copy everything below the line into the next AI (Cursor/SSH session that can reach helper `.250` and NAS `.233`).
 
 ---

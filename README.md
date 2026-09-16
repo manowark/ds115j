@@ -2,7 +2,8 @@
 
 Bring a **Synology DS115j** (Marvell Armada 370, 256 MiB RAM) to the same **Debian 13 (trixie) armhf daily-ready** state as the live box on this LAN, or **reinstall this one**.
 
-This is a practical UART + TFTP + HDD kit. It is **not** a dump of the helper’s linux tree, DSM extracts, or build history.
+This is a self-contained UART + TFTP + HDD kit. A fresh clone contains the
+known-good boot artifacts and the complete Debian rootfs payload.
 
 **Start here for a new box or a wipe/reinstall:** [docs/install-uart.md](docs/install-uart.md)
 
@@ -17,7 +18,7 @@ Live probe: [docs/current-state.md](docs/current-state.md). Cold-boot checklist:
 | Role | Address | Login |
 |------|---------|--------|
 | NAS | `192.168.68.233/22` | `ssh root@192.168.68.233` password `ds115j` |
-| Helper (TFTP/HTTP) | `192.168.68.250/22` | `ssh root@192.168.68.250` password `ds115j` |
+| Laptop (TFTP) | example `192.168.68.251/22` | run `scripts/serve-tftp.sh` from this clone |
 | UART | `115200 8N1` | `screen /dev/cu.usbserial-BG01OOBA 115200` |
 
 Full notes: [docs/access.md](docs/access.md).
@@ -54,8 +55,9 @@ dts/                   good DTS/DTB
 boot/                  uImage + ramdisks
 firmware/spi/          8 MiB SPI dump (unbrick reference; do not rewrite SPI)
 modules/               qnap_poweroff_ds115j.ko + source
+rootfs/                split Debian rootfs archive (<95 MB per Git object)
 config/                interfaces, smartd, systemd examples from the live NAS
-HANDOFF/               curated helper docs (same facts, more history)
+HANDOFF/               historical bring-up notes
 ```
 
 ## Landmines (read before any U-Boot)
@@ -67,14 +69,37 @@ HANDOFF/               curated helper docs (same facts, more history)
 
 Full list: [docs/landmines.md](docs/landmines.md).
 
-## What is not in git
+## Rootfs included in git
 
-- Full Debian rootfs tarball (`rootfs-trixie-armhf.tar.gz` ~134 MiB, over GitHub’s ~100 MiB file limit). Build it on the helper with `scripts/bootstrap-rootfs.sh` or fetch from helper HTTP `:45152` if that service is running.
-- Debian `linux-image` module tree (install on-device from apt **matching** `6.12.107+deb13-armmp`, or copy from the helper).
-- The helper’s `linux/` git tree.
+GitHub rejects individual files over 100 MB, so the 134,385,614-byte archive
+is committed as two ordinary Git files:
+
+| File | Bytes | SHA-256 |
+|---|---:|---|
+| `rootfs/rootfs-trixie-armhf.tar.gz.part-aa` | 94,371,840 | `4aa9576e09e41004156dafaa488819413f21240a5ec137869597566f8e35f9b3` |
+| `rootfs/rootfs-trixie-armhf.tar.gz.part-ab` | 40,013,774 | `d224d7238803be805a440f27f339c012146beac492808bdaa4b9c51d279b744d` |
+
+Reconstruct and verify the original archive:
+
+```bash
+scripts/reconstruct-rootfs.sh
+# rootfs-trixie-armhf.tar.gz SHA-256:
+# 9d869bf8f45f6f3908097aece847bb2d1bde4a6213801cb8460cdb83f9a30eb6
+```
+
+No Git LFS client or helper host is required. To rebuild from Debian mirrors
+instead, a Linux machine with `mmdebstrap` can run
+`sudo scripts/bootstrap-rootfs.sh`.
 
 First-boot `dpkg --configure -a` and `apt-get` **need Internet on the NAS**.
 
-## Helper vs this repo
+## Laptop serving
 
-The Raspberry Pi helper still holds the large build tree at `/root/ds115j` and live TFTP at `/srv/tftp`. This GitHub repo is the portable install kit. Prefer copying images **from this repo or helper TFTP**; do not wipe live `sda1`/`sda2` while testing.
+Give the laptop a LAN address such as `192.168.68.251/22`, then run:
+
+```bash
+scripts/serve-tftp.sh
+```
+
+The script stages and serves the three files in `boot/`. The former Raspberry
+Pi helper is historical and optional; installation and recovery do not use it.

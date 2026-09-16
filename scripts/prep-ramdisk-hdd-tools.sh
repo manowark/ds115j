@@ -1,9 +1,9 @@
 #!/bin/bash
 # Copy armhf mke2fs + libs into the TFTP ramdisk so the NAS can mkfs the HDD.
 set -euo pipefail
-ROOT=/root/ds115j
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 IR=$ROOT/initramfs
-RFS=$ROOT/rootfs
+RFS=${TARGET:-$ROOT/rootfs-build}
 
 mkdir -p "$IR/lib/arm-linux-gnueabihf" "$IR/sbin" "$IR/lib" "$IR/bin"
 install -m 0755 "$RFS/usr/sbin/mke2fs" "$IR/sbin/mke2fs"
