@@ -19,8 +19,8 @@ Enable Magic Packet wake-up on `eth0`. Allows powering on the NAS remotely from 
 ### What it does
 
 - Installs `ethtool` if missing
-- Deploys udev rule: `/etc/udev/rules.d/70-wol-eth0.rules`
-- Enables WoL immediately: `ethtool -s eth0 wol g`
+- Deploys systemd oneshot service: `/etc/systemd/system/wol.service` (runs `ethtool -s eth0 wol g` after `network.target`, survives reboots)
+- Also deploys udev rule `/etc/udev/rules.d/70-wol-eth0.rules` as an early attempt (harmless if it fires before the interface is ready)
 
 ### Verify
 
@@ -32,7 +32,8 @@ ethtool eth0 | grep Wake-on
 ### Remove
 
 ```bash
-rm /etc/udev/rules.d/70-wol-eth0.rules
+systemctl disable --now wol.service
+rm /etc/systemd/system/wol.service /etc/udev/rules.d/70-wol-eth0.rules
 ethtool -s eth0 wol d
 ```
 

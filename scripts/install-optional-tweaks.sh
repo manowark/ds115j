@@ -38,7 +38,10 @@ install_wol() {
   echo "[wol] Installing Wake-on-LAN..."
   # Ensure ethtool is installed
   run "DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ethtool >/dev/null 2>&1"
-  # Deploy udev rule
+  # Deploy systemd oneshot service (reliable, runs after network.target)
+  deploy "${CONFIG_DIR}/wol.service" /etc/systemd/system/wol.service
+  run "systemctl daemon-reload && systemctl enable wol.service >/dev/null 2>&1"
+  # Deploy udev rule as early attempt (harmless)
   deploy "${CONFIG_DIR}/70-wol-eth0.rules" /etc/udev/rules.d/70-wol-eth0.rules
   # Enable now
   run "ethtool -s eth0 wol g"
