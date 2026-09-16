@@ -1,4 +1,8 @@
 Drop 8 MiB SPI dumps here (exactly 8388608 bytes). Do not saveenv until verified.
+Do not `sf write` / `bubt` these dumps unless you intend to rewrite NOR.
+
+Also kept: ds115j-vendor-20260915-124844.bin (65536 bytes, SHA-256 9cc6345f…)
+— vendor 64 KiB companion dump from the same session as the 8 MiB image.
 
 Ways in:
   TCP 45151  — python3 scripts/spi-recv-daemon.py (running)
