@@ -1,2 +1,0 @@
-# Wake-on-LAN: enable MagicPacket on eth0 at boot
-ACTION=="add", SUBSYSTEM=="net", KERNEL=="eth0", RUN+="/usr/sbin/ethtool -s eth0 wol g"

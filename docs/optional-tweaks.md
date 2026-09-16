@@ -4,43 +4,7 @@ Performance and convenience tweaks for DS115j. **None of these are required** â€
 
 ---
 
-## 1. Wake-on-LAN
-
-Enable Magic Packet wake-up on `eth0`. Allows powering on the NAS remotely from another device.
-
-**Dependency:** `ethtool` (auto-installed)
-
-### Install
-
-```bash
-NAS_PASS=<password> ./install-optional-tweaks.sh wol
-```
-
-### What it does
-
-- Installs `ethtool` if missing
-- Deploys systemd oneshot service: `/etc/systemd/system/wol.service` (runs `ethtool -s eth0 wol g` after `network.target`, survives reboots)
-- Also deploys udev rule `/etc/udev/rules.d/70-wol-eth0.rules` as an early attempt (harmless if it fires before the interface is ready)
-
-### Verify
-
-```bash
-ethtool eth0 | grep Wake-on
-# Expected: Wake-on: g
-```
-
-### Remove
-
-```bash
-systemctl disable --now wol.service
-rm /etc/systemd/system/wol.service /etc/udev/rules.d/70-wol-eth0.rules
-systemctl daemon-reload
-ethtool -s eth0 wol d
-```
-
----
-
-## 2. Sysctl: BBR + TCP Buffer Tuning
+## 1. Sysctl: BBR + TCP Buffer Tuning
 
 Switches TCP congestion control to BBR and increases buffer sizes for better GbE throughput.
 
@@ -73,7 +37,7 @@ sysctl --system   # reverts to kernel defaults
 
 ---
 
-## 3. USB Auto-Mount
+## 2. USB Auto-Mount
 
 Automatically mount USB block devices to `/mnt/usb-<device>` when plugged in.
 
@@ -119,3 +83,7 @@ NAS_PASS=<password> ./install-optional-tweaks.sh all
 ## Hardware Note
 
 These tweaks are optimized for DS115j (Marvell Armada 370, 256 MB RAM, single-core ARM). They work on any Debian system but buffer sizes and BBR tuning are specifically chosen for this hardware profile.
+
+## Known Non-Functional
+
+Wake-on-LAN is **not usable** on this hardware: the Ethernet controller is integrated into the Armada 370 SoC and loses power on `poweroff`, so Magic Packets cannot wake the device. Do not attempt to add a WoL tweak.
