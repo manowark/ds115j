@@ -153,7 +153,10 @@ umount /mnt
 
 **MAC:** live unit is `00:11:32:4d:c3:b8`. On a **new** chassis, put **that unit’s** sticker MAC into `config/interfaces` and `config/10-ds115j-eth0.link` — do not clone the old MAC onto two boxes.
 
-After first boot, install matching kernel modules (`linux-image-6.12.107+deb13-armmp`) from Debian **without** jumping to a newer ABI, then [§6](#6-install-userspace-scripts-mcu-fan-smart-poweroff).
+The shipped rootfs already includes the
+`6.12.107+deb13-armmp` module tree matching `boot/uImage-ds115j`. Do not replace
+it with a newer ABI during installation. Continue with
+[§6](#6-install-userspace-scripts-mcu-fan-smart-poweroff).
 
 ## 5. Install boot images on `sda2`
 
@@ -251,5 +254,6 @@ Keep a verified **8388608-byte** dump. This repo has `firmware/spi/ds115j-spi-8m
 - Full debootstrap / first `apt-get` needs **Internet on the NAS**.
 - Rootfs extraction itself is offline after cloning; first-boot package
   configuration still needs Internet.
-- Kernel module tree is not in git; match vermagic `6.12.107+deb13-armmp`.
+- The matching kernel module tree is inside the split rootfs archive; the
+  custom poweroff module is also present separately in `modules/`.
 - Stock U-Boot `bootcmd` on a brand-new DSM box will not load Debian until you either type the `ext2load ide 0:2` sequence each boot or perform a **separately reviewed** env change (SPI landmine).
