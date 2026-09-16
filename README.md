@@ -5,7 +5,7 @@ Bring a **Synology DS115j** (Marvell Armada 370, 256 MiB RAM) to the same **De
 This is a self-contained UART + TFTP + HDD kit. A fresh clone contains the
 known-good boot artifacts and the complete Debian rootfs payload.
 
-**Start here for a new box or a wipe/reinstall:** [docs/install-uart.md](docs/install-uart.md)
+**For a complete helper-free daily-ready install or reinstall, follow only [docs/install-uart.md](docs/install-uart.md).**
 
 ## Daily-ready scope (2026-09-16)
 

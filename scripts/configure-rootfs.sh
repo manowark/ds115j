@@ -22,7 +22,9 @@ install -d "$TARGET/etc/network/interfaces.d" \
            "$TARGET/etc/ssh/sshd_config.d" \
            "$TARGET/etc/systemd/network" \
            "$TARGET/etc/modules-load.d" \
+           "$TARGET/etc/apt" \
            "$TARGET/root" \
+           "$TARGET/srv/data" \
            "$TARGET/lib/modules"
 
 cat > "$TARGET/etc/hostname" <<'EOF'
@@ -35,42 +37,17 @@ cat > "$TARGET/etc/hosts" <<'EOF'
 ::1		localhost ip6-localhost ip6-loopback
 EOF
 
-cat > "$TARGET/etc/fstab" <<'EOF'
-# USB (default) or HDD partition labelled rootfs. Do not use /dev/sdX names:
-# with both SATA and USB present the lettering moves.
-LABEL=rootfs	/	ext4	errors=remount-ro	0	1
-proc		/proc	proc	defaults		0	0
-sysfs		/sys	sysfs	defaults		0	0
-EOF
-
-cat > "$TARGET/etc/network/interfaces" <<'EOF'
-auto lo
-iface lo inet loopback
-
-auto eth0
-iface eth0 inet static
-	address 192.168.68.233/22
-	gateway 192.168.68.1
-	pre-up /sbin/modprobe marvell
-	pre-up /sbin/modprobe mvmdio
-	pre-up /sbin/modprobe mvneta
-	pre-up /sbin/ip link set dev eth0 address 00:11:32:4d:c3:b8
-	dns-nameservers 192.168.68.1 1.1.1.1
-EOF
+install -m 0644 "$ROOT/config/fstab" "$TARGET/etc/fstab"
+install -m 0644 "$ROOT/config/interfaces" "$TARGET/etc/network/interfaces"
+install -m 0644 "$ROOT/config/sources.list" "$TARGET/etc/apt/sources.list"
 
 cat > "$TARGET/etc/resolv.conf" <<'EOF'
 nameserver 192.168.68.1
 nameserver 1.1.1.1
 EOF
 
-cat > "$TARGET/etc/systemd/network/10-ds115j-eth0.link" <<'EOF'
-[Match]
-OriginalName=eth0
-
-[Link]
-MACAddress=00:11:32:4d:c3:b8
-NamePolicy=keep
-EOF
+install -m 0644 "$ROOT/config/10-ds115j-eth0.link" \
+    "$TARGET/etc/systemd/network/10-ds115j-eth0.link"
 
 # OpenSSH will not start without the main file (drop-ins are not enough).
 cat > "$TARGET/etc/ssh/sshd_config" <<'EOF'
@@ -203,7 +180,7 @@ Debian trixie armhf for Synology DS115j (built off-device).
 Temporary root password: ds115j
 Change it: passwd
 
-eth0 is static 192.168.68.233/22, gateway 192.168.68.1.
+eth0 uses DHCP plus permanent 192.168.68.233/22 on label eth0:1.
 
 This tree is meant for sda1 on the NAS HDD (U-Boot ide, not scsi).
 See the repository's docs/install-uart.md for the three-part disk layout.

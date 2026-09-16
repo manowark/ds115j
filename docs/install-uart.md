@@ -7,7 +7,9 @@ Two cases:
 1. **New DS115j** (stock DSM, blank disk, or unknown) → Debian like the current daily-ready box.
 2. **Reinstall this device** (the NAS already on `.233`) without casually destroying `sda3` data.
 
-Read [landmines.md](landmines.md) first. Recovery-only (already Debian, just won’t boot): [recovery.md](recovery.md).
+This page is the complete happy path. You do not need a helper machine, an
+agent, or another document: only this repository on the laptop, Internet
+access from the NAS for `apt`, and the UART/TFTP connection below.
 
 ## 0. Desk setup
 
@@ -25,7 +27,9 @@ Kill stale `screen` sessions before you start (`screen -ls`).
 
 **Never type `ide 0:1`.** This U-Boot **hangs**. Boot files are only on **`ide 0:2`** (`sda2`, 128 MiB ext2 `LABEL=boot`). Root is `sda1` (`LABEL=rootfs`). Data is `sda3` (`LABEL=data` → `/srv/data`).
 
-Do not `saveenv`, `sf erase`, `sf write`, `bubt`, or `fw_setenv`.
+Never type `ide 0:1`, never set the fan to `0`, never run `ifdown eth0`, and
+never write SPI (`sf erase`, `sf write`, `bubt`, `fw_setenv`). The default
+boot method below does not use `saveenv`.
 
 Current good images (also in `boot/` of this repo):
 
@@ -48,7 +52,10 @@ You are only going to **type** boot commands. Do not `saveenv`.
 ## 2. Serve and TFTP the kernel from the laptop
 
 On the Mac, clone this repository and give its LAN interface an address on the
-same `/22`, for example `192.168.68.251/22`. From the repository root:
+same `/22`, for example `192.168.68.251/22`. The included network files use
+the live unit's MAC `00:11:32:4d:c3:b8`; for a different chassis, first replace
+that value in both `config/interfaces` and `config/10-ds115j-eth0.link` with
+the new unit's sticker MAC. From the repository root:
 
 ```bash
 scripts/serve-tftp.sh
@@ -104,7 +111,8 @@ If `sda2` is fine, skip to [§5](#5-install-boot-images-on-sda2) after filling `
 
 U-Boot needs **MBR (dos)** and **partition 2 = boot**. Prefer 1 MiB alignment on a blank disk (the live NAS still has historical start-sector 63; do not clone that to a new drive unless you are restoring this exact disk).
 
-Example (BusyBox `fdisk` / `sfdisk`; adjust sizes to the disk):
+Example (BusyBox `fdisk` / `sfdisk`; adjust sizes to the disk). Create an MBR
+partition table in this exact order; `sda3` is the daily data volume:
 
 ```text
 sda1  64G   type 83   later: mkfs.ext4 -L rootfs /dev/sda1
@@ -139,81 +147,52 @@ mkdir -p /mnt
 mount /dev/sda1 /mnt
 wget -O /tmp/rootfs.tgz http://192.168.68.251:45152/rootfs-trixie-armhf.tar.gz
 tar -C /mnt -xzf /tmp/rootfs.tgz
-# overlay this kit's config (network, fstab) — see config/
-cp /path/to/kit/config/fstab /mnt/etc/fstab
-# if the tarball still has static-only eth0, replace with config/interfaces
+mkdir -p /mnt/etc/network /mnt/etc/systemd/network /mnt/etc/apt /mnt/srv/data
+wget -O /mnt/etc/network/interfaces \
+  http://192.168.68.251:45152/config/interfaces
+wget -O /mnt/etc/systemd/network/10-ds115j-eth0.link \
+  http://192.168.68.251:45152/config/10-ds115j-eth0.link
+wget -O /mnt/etc/fstab \
+  http://192.168.68.251:45152/config/fstab
+wget -O /mnt/etc/apt/sources.list \
+  http://192.168.68.251:45152/config/sources.list
 sync
 umount /mnt
 ```
 
-`scripts/configure-rootfs.sh` is the off-device rootfs overlay (hostname
-`ds115j`, serial getty, SSH, root hash for password `ds115j`).
-`scripts/fix-hdd-root.sh` can be copied into the recovery ramdisk and run as
-`fix-hdd-root.sh /mnt` if SSH/network/login are wrong.
-
-**MAC:** live unit is `00:11:32:4d:c3:b8`. On a **new** chassis, put **that unit’s** sticker MAC into `config/interfaces` and `config/10-ds115j-eth0.link` — do not clone the old MAC onto two boxes.
+Those four files provide DHCP on `eth0`, permanent `192.168.68.233/22` labelled
+`eth0:1`, stable MAC naming, `LABEL=data` at `/srv/data`, and Debian trixie,
+updates, and security repositories. There is deliberately no
+`auto eth0:1 inet static` stanza.
 
 The shipped rootfs already includes the
 `6.12.107+deb13-armmp` module tree matching `boot/uImage-ds115j`. Do not replace
-it with a newer ABI during installation. Continue with
-[§6](#6-install-userspace-scripts-mcu-fan-smart-poweroff).
+it with a newer ABI during installation. Continue with §5.
 
 ## 5. Install boot images on `sda2`
 
-From a running Debian (preferred) use [`scripts/deploy-boot.sh`](../scripts/deploy-boot.sh). It mounts `sda2`, keeps a few `*.pre-*` copies, verifies SHA-256, and **never** touches `sda1`/`sda3`.
-
-From this kit, make a bundle directory:
+Keep the laptop HTTP server from §4 running. From recovery:
 
 ```sh
-mkdir -p /root/boot-deploy/5ea71e0b-noalarm
-cp uImage-ds115j uRamdisk-hdd-ds115j SHA256SUMS /root/boot-deploy/5ea71e0b-noalarm/
-# SHA256SUMS uses names without the "boot/" prefix; rename to MANIFEST if you like:
-cp SHA256SUMS /root/boot-deploy/5ea71e0b-noalarm/MANIFEST
-/root/deploy-boot.sh /root/boot-deploy/5ea71e0b-noalarm deploy
-```
-
-From recovery, by hand:
-
-```sh
-mkdir -p /mnt/boot
+mkdir -p /mnt
 mount /dev/sda2 /mnt
 mkdir -p /mnt/boot
-# copy uImage-ds115j and uRamdisk-hdd-ds115j into /mnt/boot
-# fetch from the laptop TFTP/HTTP server or copy from the cloned repository
-sha256sum /mnt/boot/uImage-ds115j /mnt/boot/uRamdisk-hdd-ds115j
+wget -O /mnt/boot/uImage-ds115j \
+  http://192.168.68.251:45152/boot/uImage-ds115j
+wget -O /mnt/boot/uRamdisk-hdd-ds115j \
+  http://192.168.68.251:45152/boot/uRamdisk-hdd-ds115j
+echo '5ea71e0bc69a17ae269e278eedc28288702f1259edffefd97d420e01141ae3e8  /mnt/boot/uImage-ds115j' | sha256sum -c -
+echo 'dbbd30ec2c3772e2816eaa5e3295b0580a357fc93458dcb3bf063bf7bf65cd75  /mnt/boot/uRamdisk-hdd-ds115j' | sha256sum -c -
 sync
 umount /mnt
 ```
 
 U-Boot load path is **`/boot/uImage-ds115j` on `ide 0:2`**, which is Linux `/boot` **on `sda2`**, not `/boot` on `sda1`.
 
-## 6. Install userspace scripts (MCU LED, fan, SMART amber, poweroff)
+## 6. First local boot and daily-ready userspace
 
-Once Debian on `sda1` is up (UART login or SSH):
-
-```sh
-# copy this repo onto the NAS, then:
-sh scripts/install-userspace.sh
-```
-
-That installs:
-
-| Piece | Files |
-|-------|--------|
-| MCU LEDs/beep | `syno-mcu.sh`, `syno-mcu-boot.sh`, two systemd units |
-| Fan | `syno-fan.sh` + `syno-fan.service` (never pwm 0; never unbind `gpio-fan`) |
-| SMART amber | `smart-amber-led.sh` + timer/service + `config/smartd.conf` |
-| Soft poweroff | `modules/qnap-poweroff-ds115j.ko` → `/lib/modules/$(uname -r)/extra/` + `modules-load.d` |
-
-Network snapshot: `config/interfaces` (DHCP + **`.233` on `eth0:1`**). Never `ifdown eth0` from the only SSH session. Never `auto eth0:1`.
-
-Also enable `dbus` if `reboot`/`timedatectl` fail with “Failed to connect to system scope bus”.
-
-Packages you will want from apt (Internet): `smartmontools`, `chrony`, `zram-tools` (then `config/zramswap`), `dbus`. Journal cap: `config/journald.conf`.
-
-## 7. First local boot (no TFTP)
-
-Interrupt U-Boot again and **type** (do not `saveenv` unless you already have a reviewed SPI procedure):
+Interrupt U-Boot and type these commands. Do this on every boot until you
+deliberately choose the optional persistent method in §8:
 
 ```text
 ide reset
@@ -223,37 +202,123 @@ setenv bootargs 'console=ttyS0,115200 earlyprintk root=LABEL=rootfs rootwait rw 
 bootm 0x01000000 0x02000000
 ```
 
-If that works, the existing `bootcmd` on this unit already does the same from `ide 0:2`. On a **new** unit, stock DSM `bootcmd` will not. Leave env alone until you are ready for a dedicated, dump-verified env change — until then, interrupt and type, or keep using TFTP.
+Log in on UART as `root` / `ds115j`. Wait for the one-time Debian second stage
+to finish, confirm Internet works, download this repository directly, and run
+the installer:
 
-## 8. Network `.233` pattern
+```sh
+while [ ! -e /etc/ds115j-second-stage-done ]; do
+  systemctl is-failed --quiet ds115j-second-stage.service && {
+    systemctl status ds115j-second-stage.service --no-pager
+    exit 1
+  }
+  sleep 5
+done
+ping -c 3 deb.debian.org
+cd /root
+wget -O ds115j-main.tar.gz \
+  https://github.com/manowark/ds115j/archive/refs/heads/main.tar.gz
+tar -xzf ds115j-main.tar.gz
+cd ds115j-main
+sh scripts/install-userspace.sh
+```
 
-Target: SSH always at `192.168.68.233`, plus DHCP on `eth0` when a server answers.
+`install-userspace.sh` explicitly installs `chrony`, `zram-tools`,
+`smartmontools`, `dbus`, `ifupdown`, the DHCP client, `kmod`, and CA
+certificates. It installs trixie/updates/security apt sources, the DHCP +
+`.233` network config and `.link`, creates `/srv/data`, installs the
+`LABEL=data` fstab entry, then installs and enables:
 
-Use `config/interfaces` and `config/10-ds115j-eth0.link`. Cosmetic `Address already assigned` in logs is OK.
+| Piece | Files |
+|-------|--------|
+| MCU LEDs/beep | `syno-mcu.sh`, `syno-mcu-boot.sh`, two systemd units |
+| Fan | `syno-fan.sh` + `syno-fan.service` (never pwm 0; never unbind `gpio-fan`) |
+| SMART amber | `smart-amber-led.sh` + timer/service + `config/smartd.conf` |
+| Soft poweroff | matching bundled rootfs module + `modules-load.d` |
+| Base services | `chrony`, `zramswap`, `smartmontools`, `dbus`, `networking` |
+
+The installer never restarts networking, so it does not drop the current UART
+or SSH session. Reboot and type the same U-Boot commands once more to apply all
+boot-time settings.
+
+```sh
+reboot
+```
+
+## 7. Default safe boot (works without SPI changes)
+
+For normal daily use, keep UART attached, interrupt the three-second countdown,
+and type:
+
+```text
+ide reset
+ext2load ide 0:2 0x01000000 /boot/uImage-ds115j
+ext2load ide 0:2 0x02000000 /boot/uRamdisk-hdd-ds115j
+setenv bootargs 'console=ttyS0,115200 earlyprintk root=LABEL=rootfs rootwait rw panic=10'
+bootm 0x01000000 0x02000000
+```
+
+This is the default supported path and works on both a stock and an already
+converted unit without changing SPI.
+
+## 8. Optional unattended boot — high-risk `saveenv`
+
+Skip this section unless unattended cold boot is essential. Synology placed
+the U-Boot environment at SPI offset `0x00100000`, inside the stock kernel
+area. A bad write can brick the NAS. Keep UART attached throughout.
+
+Before the one permitted `saveenv`, make a **board-specific** 8 MiB dump:
+
+1. Run `sh scripts/dump-spi-linux.sh` on the NAS.
+2. Copy `/tmp/ds115j-spi-8m.bin` into this clone under `firmware/spi/` with a
+   unique chassis/date name.
+3. Verify `wc -c` reports exactly `8388608`, run `sha256sum`, save the matching
+   `.sha256` file in `firmware/spi/`, and copy both files off the NAS.
+4. Reboot with UART, type the §7 commands, and confirm they boot successfully.
+5. At the next `Marvell>>` prompt, inspect `printenv bootargs bootcmd`. Only
+   then set the exact values proven by the live DS115j:
+
+```text
+setenv bootargs 'console=ttyS0,115200 earlyprintk root=LABEL=rootfs rootwait rw panic=10'
+setenv bootcmd 'ide reset; ext2load ide 0:2 0x01000000 /boot/uImage-ds115j; ext2load ide 0:2 0x02000000 /boot/uRamdisk-hdd-ds115j; bootm 0x01000000 0x02000000'
+printenv bootargs bootcmd
+saveenv
+```
+
+Power-cycle once with UART attached. If anything differs from those exact
+values, do **not** run `saveenv`; continue using §7.
 
 ## 9. Checks
 
 ```sh
-uname -a                    # 6.12.107+deb13-armmp
-ip -4 addr                  # .233 on eth0:1
-systemctl --failed          # empty
-systemctl is-active syno-fan.service syno-mcu-boot.service smartd.service
+uname -r                    # 6.12.107+deb13-armmp
+ip -4 addr show dev eth0    # DHCP plus .233 labelled eth0:1
+findmnt /srv/data            # source carrying LABEL=data, rw,noatime
+apt-get update               # trixie + updates + security succeed
+chronyc tracking             # Leap status: Normal
+swapon --show                # /dev/zram0, priority 100
+smartctl -H /dev/sda         # SMART overall-health PASSED on a healthy disk
+systemctl --failed           # empty
+systemctl is-active networking chrony zramswap smartmontools dbus
+systemctl is-active syno-fan.service syno-mcu-boot-begin.service
+systemctl is-active syno-mcu-boot.service smart-amber-led.timer
+/usr/local/sbin/syno-mcu.sh ping
 lsmod | grep qnap_poweroff
 test -e /sys/firmware/devicetree/base/gpio-fan/alarm-gpios && echo BAD || echo ABSENT
-sha256sum /mnt/boot/uImage-ds115j   # if sda2 mounted; expect 5ea71e0b…
+test "$(cat /sys/class/leds/synology:amber:disk/brightness)" = 0
+test "$(cat /sys/class/hwmon/hwmon1/pwm1)" -gt 0
 ```
 
-LED map: [led-behaviour.md](led-behaviour.md). SMART amber test: [smart-amber-led.md](smart-amber-led.md).
+The ready state is: blue power steady, status green steady after one short
+beep, bay green controlled by SATA, bay amber off while SMART is healthy. The
+fan must never read `0`. `poweroff` is expected to cut PSU power through
+`qnap_poweroff_ds115j`; test it only while physically present to press the
+front power button afterward.
 
-## 10. SPI dump (new device, before any env experiment)
+## 10. Daily-ready result
 
-Keep a verified **8388608-byte** dump. This repo has `firmware/spi/ds115j-spi-8m-20260915-124830.bin` (SHA `cfbdc0dd…`) from **this** unit — useful as a reference, not a random flash image for a different board. Helper scripts: `scripts/dump-spi-linux.sh`, `scripts/spi-recv-daemon.py`. **Dumping is fine. Writing SPI is not routine.**
-
-## Gaps
-
-- Full debootstrap / first `apt-get` needs **Internet on the NAS**.
-- Rootfs extraction itself is offline after cloning; first-boot package
-  configuration still needs Internet.
-- The matching kernel module tree is inside the split rootfs archive; the
-  custom poweroff module is also present separately in `modules/`.
-- Stock U-Boot `bootcmd` on a brand-new DSM box will not load Debian until you either type the `ext2load ide 0:2` sequence each boot or perform a **separately reviewed** env change (SPI landmine).
+When every §9 check passes, the NAS is daily-ready: local HDD boot, DHCP plus
+permanent `.233`, `/srv/data`, working trixie apt, SMART monitoring and amber
+fault indication, chrony, zram, MCU boot/ready LEDs and beep, temperature fan
+control, and the soft-poweroff module. The only external requirement after
+rootfs extraction is Internet access for the explicit apt installation.
