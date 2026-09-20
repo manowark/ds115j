@@ -51,6 +51,44 @@
         };
     };
 
+    /*
+     * USB VBUS is gated by a load switch driven from MPP44 (gpio1 pin 12).
+     * The switch turns 5 V on when the line is LOW, so the gpio specifier
+     * carries GPIO_ACTIVE_LOW (the kernel inverts the physical output) and
+     * the regulator is always-on: with no node, USB ports get no power
+     * (no LED, no enumeration) even though the EHCI host itself
+     * initializes fine. Source: Doozan community DTS for DS115j, derived
+     * from Synology GPL board sources ("DS115j GPIO Init").
+     *
+     * VERIFIED on hardware (kernel 6.12): regulator "USB Power" probes,
+     * gpio-44 is driven low, both ports enumerate.
+     *
+     * NOTE: do NOT add a "marvell,function = \"gpio\"" pinctrl pin node
+     * for mpp44 — armada-370-pinctrl rejects "gpio" as an unsupported
+     * function on mpp44 and fails to register the pinctrl map, which makes
+     * the regulator probe fail. mpp44 is in GPIO mode by default.
+     *
+     * NOTE: "enable-active-low" is NOT parsed by regulator-fixed in 6.12
+     * (it was a legacy pre-gpiod property); polarity comes solely from the
+     * GPIO_ACTIVE_LOW flag in the gpio cell.
+     */
+    regulators {
+        compatible = "simple-bus";
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        usb_regulator: usb-regulator@2 {
+            compatible = "regulator-fixed";
+            reg = <2>;
+            regulator-name = "USB Power";
+            regulator-min-microvolt = <5000000>;
+            regulator-max-microvolt = <5000000>;
+            regulator-always-on;
+            regulator-boot-on;
+            gpio = <&gpio1 12 GPIO_ACTIVE_LOW>;
+        };
+    };
+
     soc {
         ranges = <MBUS_ID(0xf0, 0x01) 0 0xf1000000 0x100000
                   MBUS_ID(0x01, 0xe0) 0 0xfff00000 0x100000

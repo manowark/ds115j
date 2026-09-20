@@ -10,16 +10,17 @@ Goal: **restore bootability or get back onto the running system** using U-Boot +
 | Laptop | operator-chosen, example 192.168.68.251/22 | `scripts/serve-tftp.sh` from this clone |
 | Gateway/DNS | 192.168.68.1 | — |
 
-## Boot image inventory (verified 2026-09-16)
+## Boot image inventory (verified 2026-09-20)
 
 All uImages are Debian 6.12.107 `Linux/ARM` legacy images, load/entry `0x008000`. Ramdisk uImages load/entry `0x04000000`.
 
 | Image (sha256[16]) | sda2:/boot (U-Boot source) | helper /srv/tftp | helper artifacts | note |
 |---|---|---|---|---|
-| `5ea71e0bc69a17ae` | **`uImage-ds115j`** (current) | **`uImage-ds115j`** (TFTP default) + `uImage-ds115j.new-noalarm` | `uImage-ds115j.new-noalarm` | **NO alarm-gpios (MUST-1)**; TFTP default promoted 2026-09-16 11:31 UTC |
+| `6b58d6eee9700584` | **`uImage-ds115j`** (current) | — | `ds115j-usb-build/uImage-ds115j-v2` | **USB VBUS fix (2026-09-20)**: DTB adds `regulators/usb-regulator@2` on **MPP44 (gpio1 pin 12, GPIO_ACTIVE_LOW), always-on**; same kernel zImage (6.12.107), new appended DTB (14 258 B); verified live — both USB ports enumerate, flash readable |
+| `5ea71e0bc69a17ae` | `uImage-ds115j.pre-20260920-205106` | `uImage-ds115j` (TFTP default) + `uImage-ds115j.new-noalarm` | `uImage-ds115j.new-noalarm` | previous; **NO alarm-gpios (MUST-1)**; TFTP default promoted 2026-09-16 11:31 UTC |
+| `6b58d6eee9700584` | (history) `uImage-ds115j.pre-20260920-204520` | — | — | intermediate v1 build (had pinctrl mpp44 node — **do not use**, breaks regulator probe) |
 | `c1688fda25f1472d` | `uImage-ds115j.pre-noalarm-20260916` | `uImage-ds115j.pre-alarm-gpios-c1688fda` + `uImage-ds115j.pre-noalarm-20260916` | `uImage-ds115j` | previous; **alarm-gpios present** — do not TFTP-boot as default |
-| `69e60698a993b487` | `uImage-ds115j.pre-poweroff-i2c-20260915` | `uImage-ds115j.pre-poweroff-i2c-20260915-1638` | — | older; alarm-gpios present |
-| `dbbd30ec2c3772e2` | **`uRamdisk-hdd-ds115j`** | `uRamdisk-hdd-ds115j` | `uRamdisk-hdd-ds115j` | HDD-root initramfs (mounts LABEL=rootfs) |
+| `dbbd30ec2c3772e2` | **`uRamdisk-hdd-ds115j`** | `uRamdisk-hdd-ds115j` | `uRamdisk-hdd-ds115j` | HDD-root initramfs (mounts LABEL=rootfs); unchanged |
 | `cc9e6bc063a1247c` | — | `uRamdisk-recovery-ds115j` | — | BusyBox recovery (fsck-ready) |
 | `cf192fe77338447a` | — | `ds115j-poweroff-i2c.dtb` | — | peripherals DTB (power-off, not current boot) |
 | `3354e4fb61ecb21a` | — (in rootfs /lib/modules) | `qnap-poweroff-ds115j.ko` | `qnap-poweroff-ds115j.ko` | power-off module, vermagic must match kernel |
