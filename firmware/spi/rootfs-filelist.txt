@@ -1,0 +1,377 @@
+DIR  
+DIR  lost+found
+DIR  var
+DIR  var/packages
+DIR  var/crash
+DIR  var/services
+DIR  var/spool
+DIR  var/cache
+DIR  var/log
+DIR  var/lib
+DIR  var/lib/disk-compatibility
+      3895  var/lib/disk-compatibility/host_rule.db
+         4  var/lib/disk-compatibility/ds115j_host_v7.version
+    246209  var/lib/disk-compatibility/ds115j_host_v7.db
+      3895  var/lib/disk-compatibility/eunit_rule.db
+DIR  var/tmp
+DIR  dev
+DIR  dev/net
+DIR  run
+DIR  run/lock
+DIR  etc
+        17  etc/host.conf
+       283  etc/nsswitch.conf
+        38  etc/resolv.conf
+      9332  etc/rc.subr
+       504  etc/group
+DIR  etc/sysconfig
+DIR  etc/sysconfig/networking
+       254  etc/sysconfig/networking/ifcfg-lo
+DIR  etc/sysconfig/network-scripts
+        42  etc/sysconfig/network-scripts/ifcfg-tun
+        38  etc/sysconfig/network-scripts/ifcfg-eth0
+        36  etc/sysconfig/network
+      1223  etc/passwd
+      8489  etc/synogrinst.sh
+       394  etc/rc.network_routing
+       347  etc/hosts.deny
+       138  etc/hosts
+DIR  etc/avahi
+      1881  etc/avahi/avahi-daemon.conf
+       886  etc/rpc
+       289  etc/services
+     15244  etc/rc
+       998  etc/mke2fs.conf
+      6872  etc/synoinfo.conf
+       421  etc/VERSION
+       167  etc/fstab
+       146  etc/crontab
+DIR  etc/dhcpc
+      3661  etc/rc.scanusbdev
+       855  etc/shadow
+        64  etc/synouser.conf
+        27  etc/ftpusers
+       161  etc/hosts.allow
+     26455  etc/rc.network
+       246  etc/motd
+      2932  etc/protocols
+DIR  etc/dhclient
+       415  etc/sysctl.conf
+       153  etc/modules.conf
+        98  etc/shells
+       532  etc/profile
+      2773  etc/termcap
+        72  etc/inetd.conf
+DIR  etc/ssl
+DIR  etc/ssl/certs
+     14970  etc/ssl/certs/ca-certificates.crt
+       112  etc/group_desc
+      3534  etc/rc.fan
+DIR  proc
+DIR  root
+      1313  root/.profile
+DIR  sys
+       569  linuxrc.syno
+     23065  linuxrc.syno.impl
+DIR  mnt
+DIR  usr
+DIR  usr/syno
+DIR  usr/syno/etc
+DIR  usr/syno/etc/rc.d
+       544  usr/syno/etc/rc.d/J04synoagentregisterd.sh
+      3454  usr/syno/etc/rc.d/J03ssdpd.sh
+       441  usr/syno/etc/rc.d/J30DisableNCQ.sh
+       856  usr/syno/etc/rc.d/J01httpd.sh
+      2730  usr/syno/etc/rc.d/J99avahi.sh
+      1086  usr/syno/etc/rc.d/J80ADTFanControl.sh
+       404  usr/syno/etc/rc.d/J98nbnsd.sh
+       296  usr/syno/etc/ncq_off_list
+DIR  usr/syno/share
+      1888  usr/syno/share/assemble_system_raid.sh
+DIR  usr/syno/share/dsmupdate
+      4259  usr/syno/share/dsmupdate/extract_upgrade_tarballs.sh
+       572  usr/syno/share/dsmupdate/decide_system_partition.sh
+       392  usr/syno/share/dsmupdate/decide_data_partition.sh
+      9245  usr/syno/share/dsmupdate/dsmupdate.subr
+      2240  usr/syno/share/dsmupdate/datadevice.sh
+DIR  usr/syno/share/synomemtester
+      2415  usr/syno/share/synomemtester/syno_memtester_util.sh
+       963  usr/syno/share/kernelversion.sh
+      1636  usr/syno/share/synorbd.sh
+       643  usr/syno/share/projectquota.sh
+      1454  usr/syno/share/reboot_handler.sh
+      1225  usr/syno/share/environments.sh
+      1102  usr/syno/share/mkfs.sh
+      1091  usr/syno/share/get_installable_devices.sh
+DIR  usr/syno/share/synogrinst
+      5410  usr/syno/share/synogrinst/grinst-common.sh
+       864  usr/syno/share/autoinstall.sh
+DIR  usr/syno/share/autoinstall
+      1824  usr/syno/share/autoinstall/prepare_files_rename.sh
+      5541  usr/syno/share/autoinstall/cleanup_rootdevice.sh
+      1395  usr/syno/share/autoinstall/prepare_files_from_extracted.sh
+      3374  usr/syno/share/autoinstall/prepare_files_from_patch_mnt.sh
+      1471  usr/syno/share/autoinstall/prepare_files.sh
+      2164  usr/syno/share/util.sh
+      3471  usr/syno/share/brm_restore_layout.sh
+       259  usr/syno/share/rootdevice.sh
+DIR  usr/syno/sbin
+      1084  usr/syno/sbin/check_rootfs_health.sh
+      2196  usr/syno/sbin/brm_restore.sh
+      1192  usr/syno/sbin/backup_junior_log.sh
+       334  usr/syno/sbin/make_system_fs.sh
+       889  usr/syno/sbin/bootup-smallupdate.sh
+      1563  usr/syno/sbin/check_root_junior_match.sh
+      9524  usr/syno/sbin/junior_expansion_pack.sh
+     80228  usr/syno/sbin/avahi-daemon
+       590  usr/syno/sbin/reset_root_compatiblie_bit.sh
+      5968  usr/syno/sbin/upgrade.sh
+      6799  usr/syno/sbin/installer.sh
+DIR  usr/syno/hotplug
+      1494  usr/syno/hotplug/firmware.agent
+      2092  usr/syno/hotplug/usb.agent.junior
+      5389  usr/syno/hotplug/hotplug.functions
+DIR  usr/syno/bin
+       927  usr/syno/bin/syno_poweroff_task
+    907301  usr/syno/bin/scemd
+      4219  usr/syno/bin/reg_ssdp_service
+    293815  usr/syno/bin/synosearchagent
+DIR  usr/syno/web
+        77  usr/syno/web/httpd.conf
+       582  usr/syno/web/web_index.html
+DIR  usr/syno/web/webman
+       474  usr/syno/web/webman/get_eula.cgi
+      1147  usr/syno/web/webman/reboot.cgi
+       227  usr/syno/web/webman/env.cgi
+      3902  usr/syno/web/webman/get_state_dual.cgi
+       621  usr/syno/web/webman/inform_browser_ts.cgi
+       715  usr/syno/web/webman/index.cgi
+        42  usr/syno/web/webman/get_install_progress.cgi
+     12169  usr/syno/web/webman/get_state.cgi
+     16543  usr/syno/web/webman/uistring.cgi
+       530  usr/syno/web/webman/update_hcl.cgi
+   1122806  usr/syno/web/main.js
+DIR  usr/syno/web/texts
+DIR  usr/syno/web/texts/hun
+     29749  usr/syno/web/texts/hun/strings
+DIR  usr/syno/web/texts/rus
+     39025  usr/syno/web/texts/rus/strings
+DIR  usr/syno/web/texts/tha
+     51401  usr/syno/web/texts/tha/strings
+DIR  usr/syno/web/texts/csy
+     28611  usr/syno/web/texts/csy/strings
+DIR  usr/syno/web/texts/ptb
+     27556  usr/syno/web/texts/ptb/strings
+DIR  usr/syno/web/texts/cht
+     23756  usr/syno/web/texts/cht/strings
+DIR  usr/syno/web/texts/trk
+     27973  usr/syno/web/texts/trk/strings
+DIR  usr/syno/web/texts/jpn
+     33534  usr/syno/web/texts/jpn/strings
+DIR  usr/syno/web/texts/sve
+     27467  usr/syno/web/texts/sve/strings
+DIR  usr/syno/web/texts/ita
+     27721  usr/syno/web/texts/ita/strings
+DIR  usr/syno/web/texts/chs
+     23881  usr/syno/web/texts/chs/strings
+DIR  usr/syno/web/texts/enu
+     26226  usr/syno/web/texts/enu/strings
+DIR  usr/syno/web/texts/krn
+     28697  usr/syno/web/texts/krn/strings
+DIR  usr/syno/web/texts/nld
+     27791  usr/syno/web/texts/nld/strings
+DIR  usr/syno/web/texts/plk
+     28490  usr/syno/web/texts/plk/strings
+DIR  usr/syno/web/texts/fre
+     29789  usr/syno/web/texts/fre/strings
+DIR  usr/syno/web/texts/dan
+     26322  usr/syno/web/texts/dan/strings
+DIR  usr/syno/web/texts/nor
+     26533  usr/syno/web/texts/nor/strings
+DIR  usr/syno/web/texts/ptg
+     27929  usr/syno/web/texts/ptg/strings
+DIR  usr/syno/web/texts/ger
+     29752  usr/syno/web/texts/ger/strings
+DIR  usr/syno/web/texts/spn
+     28499  usr/syno/web/texts/spn/strings
+DIR  usr/syno/web/images
+       964  usr/syno/web/images/favicon.png
+    193968  usr/syno/web/main.min.css
+       964  usr/syno/web/favicon.png
+DIR  usr/syno/web/assets
+       688  usr/syno/web/assets/42ab2518741307c010e104204d150e9e.png
+      1625  usr/syno/web/assets/ded275e6e855bdb421f9aed96433c5de.png
+      1045  usr/syno/web/assets/3233a6e695537238e8ed78e871916c7b.png
+       527  usr/syno/web/assets/1479c43a9b586395fa8a58b2386d5bb6.png
+       309  usr/syno/web/assets/dd31e5257bf9b65e1e50e8ff93879d78.png
+      1333  usr/syno/web/assets/5d0f1d653efd8f191c79697af160e442.png
+     74330  usr/syno/web/assets/224ec4f4d2210b29f95c4cd61dda0c95.preload.png
+       862  usr/syno/web/assets/86c199aa3683a3f7e6886f50837b8f95.png
+       812  usr/syno/web/assets/1de815232722c710f26f12946e7be647.png
+       446  usr/syno/web/assets/8710c149eda822e2cea65d04294fe3b4.png
+      1206  usr/syno/web/assets/e9087ed3a24f4f1e4f30d52ce4123c82.png
+       634  usr/syno/web/assets/10918506d8c833390fe809e8e3da9e46.png
+      1812  usr/syno/web/assets/d9f44f5faac1e5afc7dbf39389585d5a.png
+      2246  usr/syno/web/assets/fd95b7fa22cf11250e5aaa818dda9d42.png
+      2668  usr/syno/web/assets/ccb6b11702e028c313fb956b9de336fd.png
+     60110  usr/syno/web/assets/c08f13c80d123b9c8e9f45e05d4b8bb1.png
+       747  usr/syno/web/assets/e421cf8b22055046ac03f4bc77898524.png
+      1124  usr/syno/web/assets/508c8c62223be228a0e2fc680aa328bb.png
+      1456  usr/syno/web/assets/95a9615f74d941642d8125d6caa0639f.png
+      1304  usr/syno/web/assets/9135693d6266ca5497970e4b5364da96.png
+      1110  usr/syno/web/assets/5e82ac965a2fb41f0af06a5638c1bf48.png
+      1226  usr/syno/web/assets/057e1d71163cb81f8e5bf2bf9d817f51.svg
+       670  usr/syno/web/assets/d8b258b1d95b0775869166bf9c929920.png
+       158  usr/syno/web/assets/f14250b527a42d4e0676943aa51bf1ed.png
+      2462  usr/syno/web/assets/a3b3b91037e09b0ffc8ec1ec698dfae1.png
+      1526  usr/syno/web/assets/c2e4f340a3a6d07554a17aa90b0ae54f.png
+       759  usr/syno/web/assets/9ae4429e4979bbf5fa0fad8cc00b368a.png
+       496  usr/syno/web/assets/06297c75da79b2043b5d8ded22aa9ddd.png
+      1343  usr/syno/web/assets/4c5a44af44c4aa4164507c3bffde83e9.png
+      1142  usr/syno/web/assets/4045646406e24fd9bede45ef0ef14f1c.png
+      2758  usr/syno/web/assets/3418e9e8bf5852ec15a2d0264ebe579f.png
+     34256  usr/syno/web/assets/d1630775688715d1b30600c340017c18.png
+      2982  usr/syno/web/assets/f0b98932e1c85f73fea670a64e3200d5.png
+       607  usr/syno/web/assets/3e882190990e069e12132f641a919251.png
+       936  usr/syno/web/assets/1ce3d62f0e64872578d354bdc80fc3c0.png
+       261  usr/syno/web/assets/93ae4193127af4f1ad5253fe2e6f9bea.png
+      3107  usr/syno/web/assets/f87bfa5184c3fbe48d7a256d64b29328.png
+       625  usr/syno/web/assets/a8923f1edf07de43789141d1e3ec82ec.png
+      1022  usr/syno/web/assets/e1be3f1a55c03c3e395c0afa27f3d3df.png
+      1473  usr/syno/web/assets/904030103b4c9b432fffa743680347ba.png
+     22692  usr/syno/web/assets/628aaba9aced771c27ada58a74480e00.png
+       617  usr/syno/web/assets/8f99cb4a84f808263737a9801cc59763.png
+       377  usr/syno/web/assets/2787a7fba33f2cf479adf9c40566a948.png
+      1990  usr/syno/web/assets/b1bb2ad9cb6b7e7093832e990d6c9bf7.png
+     60904  usr/syno/web/assets/676ca886d7b770c0463e7d22680a861d.png
+      1139  usr/syno/web/assets/5f537602eeff6aec70f5129d3713e995.png
+      3756  usr/syno/web/assets/acb27906627a2e78a2eaf77f29f008da.png
+       900  usr/syno/web/assets/2371337078580051d80168cd64fb3ee2.png
+     20424  usr/syno/web/assets/718b696d39bcbfabe3f5abd9efa831d7.png
+       216  usr/syno/web/assets/9b0f1457b0abb63b9c9bdccc8033e8fb.png
+      1322  usr/syno/web/assets/09f81f8e0bb4f313a32200d7fbf89143.png
+       246  usr/syno/web/assets/a3132358f1faea027ca1625099f9f7dc.png
+      1161  usr/syno/web/assets/e1722eaca6356b2af4425e49a3c8a5b1.png
+       770  usr/syno/web/assets/2536c53f4045e72e7743ea61488cbfe4.png
+     10448  usr/syno/web/assets/f1cbdb19756532907cf317bd5e5f93da.png
+      1222  usr/syno/web/assets/5aa8b42f301ec49709a274ce402de781.png
+       959  usr/syno/web/assets/e5f3ef585da256aab17e075446261e6c.png
+      1082  usr/syno/web/assets/857e914ade36819c1758237d060ce5d9.png
+       967  usr/syno/web/assets/d5dbff884dc200e502ea46e943f54957.png
+       353  usr/syno/web/assets/1dd49eeaa72e19fb4d56c23753b3b84d.png
+      1076  usr/syno/web/assets/7d751ee48336bc1bff01e3acfe3c8eff.png
+       768  usr/syno/web/assets/e823129f2cdb1a9d18dbfce447a8b977.png
+       846  usr/syno/web/assets/e8104ebeb834b453e4c82264dc7636c6.png
+      2088  usr/syno/web/assets/89ebc9bce047b4f6d62a4c7353dab343.png
+       673  usr/syno/web/assets/64f33ab9efaa47bdd9be22567508b74e.png
+       965  usr/syno/web/assets/6813d550c46547038091cf81ed89300f.png
+      1235  usr/syno/web/assets/b8de195a71326592fe5997f0f6a4ec2e.png
+    100263  usr/syno/web/assets/fa2c83ee1e071befa729f1cce7ec3984.png
+      2680  usr/syno/web/assets/cc037ab2a9c4ebecfe92efae2d6de93e.png
+     14064  usr/syno/web/assets/30e52bb9ffee656efa379bf0e0529e64.png
+      3631  usr/syno/web/assets/dc799651418d0f2226fd429216cef175.png
+      1491  usr/syno/web/assets/914c29754b1e299d57eaeaf288b64343.png
+      2569  usr/syno/web/assets/ee16afb3e2aa1f786e2583c3e947c352.png
+      2054  usr/syno/web/assets/1066fd4184af341f2b34fea25d720295.png
+       577  usr/syno/web/assets/652c8a6ce457422a1297de3fb67fbc35.png
+       599  usr/syno/web/assets/c86633b5a914a5ef73b62bd92c0e35ed.png
+      1029  usr/syno/web/assets/8415ba881d15dfd2814d63a73e94ed5d.png
+      4436  usr/syno/web/assets/b705dbd6f0a024ec89a772f117d03d35.png
+       553  usr/syno/web/assets/a900fb59a3e03e016083a018cf32f53b.png
+      2545  usr/syno/web/assets/4e79a6bb0b196c849dc1f02fc0a37dd7.png
+       803  usr/syno/web/assets/04fb2662509fe724c953ef002b8370a0.png
+       342  usr/syno/web/assets/3904c68eb6bbf1b48049a98e7e439735.png
+       629  usr/syno/web/assets/23fa5fc465b3120356a41a0ef1d97718.png
+       355  usr/syno/web/assets/71be476554827c8c40746c207561df61.png
+       180  usr/syno/web/assets/d1ab84f3d2153853b07ea7803b8343ed.png
+      3464  usr/syno/web/assets/b02f9e3f07196e00365ab151b65b8ab9.png
+       346  usr/syno/web/assets/a924f13e48938e91a51b01a8853c77fc.png
+      1031  usr/syno/web/assets/8763b5769219c0d03f63fd7d2eb4a0ce.png
+       820  usr/syno/web/assets/c413499a8a4598546cc4177658703408.png
+      4484  usr/syno/web/assets/04c4d99411f46211f875b22774743761.png
+      1722  usr/syno/web/assets/c37a6ee9d094bab66790ad3be81e5039.png
+      1027  usr/syno/web/assets/18e7b4966e26864ce01ef329ad418f6f.png
+      1541  usr/syno/web/assets/12c77ec4894a7da175e28f117fe3bff5.png
+       333  usr/syno/web/assets/f63a1e9e584774bb47c4474edff1791b.png
+       443  usr/syno/web/assets/c55d6006fefa7365d1384970f1e283ad.png
+      1839  usr/syno/web/assets/e8cd756c231384653a617238d1e779ae.png
+      2923  usr/syno/web/assets/49fe85b581d4198832e640629277e6e3.png
+       747  usr/syno/web/assets/874ad8f22c93f5144798db5b392a7eb2.png
+      1635  usr/syno/web/assets/36db3eae30b72b7fea7c7062bcb8de74.png
+      8754  usr/syno/web/assets/322b327fadf9ffab7e84a963c23ead52.png
+     42047  usr/syno/web/assets/f33f3e7dd5004d485e06539a602afb8e.png
+      1085  usr/syno/web/assets/801cb062e3427dfca989330959c12747.png
+      3659  usr/syno/web/assets/73560a855e6ae3b225423f1207c5d906.png
+      4052  usr/syno/web/assets/fee495dc9f7d0f6957d7caa2c4d4d06a.svg
+      1306  usr/syno/web/assets/c88b84289f17b0e81c1988491fc25c84.png
+     28173  usr/syno/web/assets/cc68fa85fa4bf1e420cffc0f1859bb95.preload.png
+       436  usr/syno/web/assets/427ee9d0089241b7c40a6f9e5e2c7a4c.png
+       583  usr/syno/web/assets/bd313f935fb44a57c6860fa43665267f.png
+DIR  usr/syno/hotplug.d
+DIR  usr/syno/hotplug.d/default
+      2904  usr/syno/hotplug.d/default/default.hotplug
+DIR  usr/syno/web_rd
+       209  usr/syno/web_rd/index.html
+        80  usr/syno/web_rd/httpd_rd.conf
+DIR  usr/local
+DIR  usr/share
+DIR  usr/share/udhcpc
+      1334  usr/share/udhcpc/default.script
+DIR  usr/sbin
+     34977  usr/sbin/burnin_test
+      1707  usr/sbin/hotplug
+    376064  usr/sbin/mdadm
+    133244  usr/sbin/sparted
+     30968  usr/sbin/memtester
+    559160  usr/sbin/mke2fsck
+      1308  usr/sbin/syno_memtester.sh
+      9772  usr/sbin/socket_client
+       885  usr/sbin/init.post
+      9792  usr/sbin/socket_server
+      1517  usr/sbin/remote_command.sh
+DIR  usr/lib
+     42928  usr/lib/libavahi-common.so.3
+       132  usr/lib/libgcc_s.so
+    195296  usr/lib/libmbedcrypto.so.7
+      9668  usr/lib/libdl-2.26.so
+     21956  usr/lib/libmsgpackc.so.2.0.0
+    124464  usr/lib/libgcc_s.so.1
+DIR  usr/lib/modules
+    359712  usr/lib/modules/nfs.ko
+     98324  usr/lib/modules/etxhci-hcd.ko
+      2512  usr/lib/modules/usb-common.ko
+     87004  usr/lib/modules/usb-storage.ko
+    237504  usr/lib/modules/sunrpc.ko
+     94300  usr/lib/modules/lockd.ko
+    217404  usr/lib/modules/usbcore.ko
+     73288  usr/lib/modules/synobios.ko
+     52232  usr/lib/modules/ehci-hcd.ko
+     64568  usr/lib/modules/fat.ko
+     41976  usr/lib/modules/auth_rpcgss.ko
+     30252  usr/lib/modules/cdc-acm.ko
+     14416  usr/lib/modules/vfat.ko
+     22692  usr/lib/modules/loop.ko
+     92632  usr/lib/libpthread-2.26.so
+    335100  usr/lib/libcurl.so.4.7.0
+     30140  usr/lib/libcrypt-2.26.so
+     95928  usr/lib/libmbedx509.so.1
+    138488  usr/lib/ld-2.26.so
+      9824  usr/lib/libanl-2.26.so
+    210452  usr/lib/libexpat.so.1.8.8
+    276016  usr/lib/libsodium.so
+    177367  usr/lib/libsynocodesign-ng-virtual-junior-wins.so.7
+   1226620  usr/lib/libc-2.26.so
+     38432  usr/lib/libnss_files-2.26.so
+    199452  usr/lib/libavahi-core.so.7
+     17880  usr/lib/libnss_dns-2.26.so
+     26292  usr/lib/libuuid.so.1.3.0
+     67276  usr/lib/libresolv-2.26.so
+     51204  usr/lib/libmbedtls.so.14
+DIR  usr/bin
+     13944  usr/bin/nbnsd
+    387972  usr/bin/busybox
+     26296  usr/bin/minissdpd
+    153748  usr/bin/curl
+      8356  usr/bin/cksum
+DIR  tmp
+DIR  volume1

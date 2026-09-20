@@ -1,0 +1,782 @@
+synobios_ioctl
+system_mode
+check_fan
+linuxI2CSmbusRegRead
+/source/synobios/armada/fan-resister.c
+%s(%d) No such fan speed exists, speed=[%d].
+/dev/ttyS1
+<3>synobios can't store to empty buffer from %s
+<3>synobios can't store to Null-terminated string with size <= 1
+<3>synobios need open %s before read
+<3>synobios need open %s before set termios
+<3>synobios %s file->f_op struct error
+<3>synobios %s file->f_op->unlocked_ioctl error
+<3>synobios ioctl TCGETS %s failed
+<3>synobios ioctl TCSETS %s failed
+ttyS1
+<6>%s have been opened in synobios
+&micropReadList.readListLock
+<3>synobios unable to open %s
+<3>synobios unable to set termios of %s
+<6>synobios open %s success
+<3>synobios need open %s before write
+<3>synobios can't write empty command to %s
+<3>synobios write %s to %s failed
+%.2x
+<3>synobios get empty ttyS current
+<6>%s wasn't opened in synobios
+get cpu arch information failed
+get crypto hw information failed
+MARVELL_ARMADA370
+resync
+requested-resync
+data-check
+recovery
+reshape
+<6>synobios: buzzer stop button pressed
+ttyS1
+<6>synobios: microp got event
+/source/synobios/armada/../synobios.c
+%s(%d) read RTC error
+%d-%d-%d %d:%d:%d UTC
+syno_card_detect
+create card detect proc entry fail
+<6>add card detect proc entry
+exdisplay_handler not implemented
+%s: Failed to get rtc time.
+(0h, %x) (1h, %x) (2h, %x) (3h, %x) (4h, %x) (5h, %x) (6h, %x)
+synobios_ioctl: SYNOIO_RTC_TIME_WRITE
+%s: Failed to set rtc time before 2005/01/01
+%s: Failed to set rtc time
+<6>synobios_ioctl: MANUTIL BUTTON MODE
+<6>synobios_ioctl: NORMAL BUTTON MODE
+<6>synobios_ioctl: SYNOIO_RECORD_EVENT, event id %x
+synobios: reset button pressed, ret = %d
+synobios: power button pressed, ret = %d
+synobios: usb button pressed, ret = %d
+<6>synobios: buzzer stop button pressed, ret = %d
+<6>%s: write microP command [%s] called by %s
+<6>%s: read microP command [%s] called by %s
+<3>Error microp log level, should be MICROP_LOG_ON or MICROP_LOG_OFF
+<4>args number %d from kernel exceeds synobios expected max %d.
+<4>Unknown synobios event type.
+synobios
+synobios: create procfs root entry fail
+malloc SYNO_SYS_STATUS fail
+<6>synobios: load, major number %d
+<6>synobios: can't set major number
+Brand: Synology
+Brand: Logitec
+Brand: Unknown brand
+Get brand function not defined.
+Model: %s
+Get model function not defined.
+syno_cpu_arch
+<6>synobios cpu_arch proc entry initialized
+syno_crypto_hw
+<6>synobios crypto_hw proc entry initialized
+syno_platform
+<6>synobios syno_platform proc entry initialized
+create syno_platform proc entry fail
+create crypto hw proc entry fail
+create cpu_arch proc entry fail
+synobios: unload
+RS-3411rpxs
+RS-3411xs
+RS-10613xs+
+DS-3611xs
+DS-412+
+DS-713+
+RS-812+
+RS-812rp+
+DS-1812+
+RS-2212+
+RS-2414+
+RS-2414rp+
+RS-2212rp+
+DS-2413+
+DS-2415+
+RS-812
+DS-1512+
+RS-3412rpxs
+RS-3412xs
+DS-3612xs
+RS-3413xs+
+RS-3614xs
+RS-3614rpxs
+RS-3614xs+
+DS-2414xs
+DS-414j
+DS-415j
+DS-215air
+DS-213
+DS-1513+
+DS-1813+
+DS-213j
+DS-114
+RS-214
+DS-214
+DS-214+
+DS-214se
+DS-114+
+DS-414
+RS-814
+RC-18015xs+
+RS-814+
+RS-814rp+
+DS-214play
+DS-414slim
+DS-415play
+DS-2015xs
+DS-115j
+RS-3415xs+
+DS-415+
+DS-3615xs
+DS-1815+
+DS-1515+
+DS-215j
+DS-115
+RS-815+
+RS-815rp+
+DS-215router
+DS-715
+RS-815
+RS-18016xs+
+RS-18016Dxs+
+DS-1515
+DS-215+
+VirtualDSM
+DS-416
+RS-2416+
+RS-2416rp+
+DS-216play
+DS-216se
+RSD-18016xs+
+DS-916+
+DS-1616+
+DS-716+
+RS-3618xs
+RS-3617rpxs
+RS-3617xs+
+DS-416j
+DS-216
+DS-416slim
+DS-216+
+DS-216j
+RS-816
+DS-116
+DS-416play
+DS-216+II
+DS-716+II
+RS-217
+FS-3017
+RS-3617xs
+RS-2418+
+RS-2418rp+
+DS-918+
+RS-4017xs+
+DS-3617xs
+RS-18017xs+
+DS-218+
+DS-1618+
+C2DSM
+DS-1517+
+DS-1817+
+DS-718+
+FS-2017
+DS-418
+DS-418j
+DS-218play
+DS-118
+DS-218
+EDS-19
+RS-819
+DS-220j
+DS-420j
+DS-1817
+DS-1517
+DS-3017xs
+DS-3018xs
+FS-1018
+DS-219j
+FS-6400
+RS-818+
+RS-818rp+
+DS-418play
+RS-2818rp+
+DS-219se
+NVR1218
+DS-218j
+DS-3619xs
+DS-119j
+TAIPEI
+RS-1619xs+
+RS-1219+
+DS-2419+
+DS-419+
+DS-1019+
+DS-719+
+DS-1819+
+DS-620slim
+RS-419+
+DS-419slim
+RS-1219
+DVA-3219
+SA-3400
+DS-420+
+DS-720+
+DS-220+
+RS-820+
+RS-820rp+
+FS-3400
+SA-3600
+FS-3600
+HD-3400
+DS-220play
+DS-220
+DS-120j
+DS-1520+
+RS-1220+
+RS-1220rp+
+DS-920+
+SA-6500
+DS-1621+
+HD-6500
+SA-3200d
+DVA-3221
+AliDSM
+RS-1221+
+RS-1221rp+
+DS-1821+
+DS-2422+
+RS-2421+
+RS-2421rp+
+RS-2821rp+
+FS-6600N
+RS-3621xs+
+RS-3621rpxs
+RS-4021xs+
+FS-6500
+DS-3617xsII
+DS-3622xs+
+DS-2419+II
+FS2500
+FS2500T
+DVA-1622
+RS-4023xs+
+RS-4022xs+
+FS-3410
+DS-223j
+DS-423
+DS-223
+DS-723+
+DS-923+
+RS-422+
+DS-1522+
+RS-822+
+RS-822rp+
+RS-2423+
+RS-2423rp+
+DS-1823xs+
+RS-1623xs+
+FS-6410
+SA-6400
+SA-6200
+DS-423+
+SA-3410
+SA-3610
+DS-123
+Unknown
+AES_CBC, DES_CBC, 3DES_CBC, MD5, MD5_HMAC, SHA1, SHA1_HMAC
+DES_CBC, 3DES_CBC, MD5, MD5_HMAC, SHA1, SHA1_HMAC, SHA2_256_HMAC
+AES_CBC, AES_ECB, AES_CTR, DES_CBC, DEC_ECB, 3DES_ECB, 3DES_CBC, SHA1_HMAC, SHA2_256_HMAC, SHA2_384_HMAC, SHA2_512_HMAC
+none
+AES_CBC
+INTEL, Xeon, E5-2620 v3, 12
+INTEL, Xeon, E5-2609 v3, 12
+INTEL, Xeon, E3-1230 v2, 4
+INTEL, Pentium, D1508, 2
+INTEL, Xeon, D-1521, 4
+INTEL, Xeon, D-1527, 4
+INTEL, Xeon, D-1528, 6
+INTEL, Xeon, D-1531, 6
+INTEL, Xeon, D-1541, 8
+INTEL, Xeon, D-1567, 12
+INTEL, Core, i3-2100, 2
+INTEL, Core, i3-4130, 2
+INTEL, Atom, D410, 1
+INTEL, Atom, D425, 1
+INTEL, Atom, D510, 2
+INTEL, Atom, D525, 2
+INTEL, Atom, D2700, 2
+INTEL, Atom, CE5335, 2
+MARVELL, Kirkwood, 88F6281, 1
+MARVELL, Kirkwood, 88F6282, 1
+MARVELL, Kirkwood, 88F6702, 1
+MARVELL, Armada 370, 88F6707, 1
+MARVELL, Armada 375, 88F6720, 2
+MARVELL, Armada 385, 88F6820, 2
+MARVELL, Armada 388, 88F6828, 2
+MARVELL, Armada 3710, 88F3710, 1
+MARVELL, Armada 3720, 88F3720, 2
+MARVELL, Armada XP, MV78230, 2
+FREESCALE, PowerQUICC II, 8241, 1
+FREESCALE, PowerQUICC III, 8533e, 1
+FREESCALE, QorIQ, P1022, 2
+MINDSPEED, Comcerto, C2000, 2
+Freescale, QorIQ series, LS1024, 2
+ANNAPURNALABS, Alpine, AL212, 2
+ANNAPURNALABS, Alpine, AL314, 4
+ANNAPURNALABS, Alpine, AL514, 4
+INTEL, Atom, C2538, 4
+BROADCOM, Northstar plus, BCM58622, 2
+INTEL, Celeron, J1800, 2
+INTEL, Celeron, J3355, 2
+INTEL, Celeron, J3455, 4
+INTEL, Celeron, J4005, 2
+INTEL, Celeron, J4025, 2
+INTEL, Celeron, J4105, 4
+INTEL, Celeron, J4125, 4
+INTEL, Pentium, J4205, 4
+STM, Monaco, STiH412, 2
+Hisillicon, Hi3535, V100, 2
+INTEL, Celeron, N3000, 2
+INTEL, Celeron, N3050, 2
+INTEL, Celeron, N3150, 4
+INTEL, Pentium, N3700, 4
+Embedded, NVR, Soc, 2
+INTEL, Celeron, N3010, 2
+INTEL, Celeron, N3060, 2
+INTEL, Celeron, N3160, 4
+INTEL, Pentium, N3710, 4
+Hisilicon, Hi3536, , 4
+Realtek, RTD1296, SoC, 4
+Realtek, RTD1293, SoC, 2
+INTEL, Atom, C3538, 4
+INTEL, Xeon, Silver 4110, 16
+Realtek, RTD1619, SoC, 6
+INTEL, Xeon, D-2143IT, 8
+AMD, Ryzen, V1500B, 4
+INTEL, Xeon, Silver 4210R, 20
+INTEL, Xeon, Silver 4214R, 24
+AMD, Ryzen, V1780B, 4
+AMD, EPYC, 7272, 12
+AMD, Ryzen, R1600, 2
+Realtek, RTD1619B, SoC, 4
+AMD, EPYC, 7232P, 8
+unknown, unknown, unknown, unknown
+Cannot get i2c adapter
+error malloc
+/source/synobios/armada/../i2c/i2c-linux.c
+%s:%d in %s: parameters error!
+Cannot get i2c adapter!
+i2c_smbus_xfer return error!
+Parameter Error.
+Failed to get time from rtc.
+Failed to set alarm data.
+Parameter Error.
+Failed to get time from rtc.
+Failed to set alarm data.
+correction with 0x%02x
+DS209
+DS409slim
+correction with 0x%02x
+Parameter Error.
+Failed to get time from rtc.
+Failed to set alarm data.
+/source/synobios/armada/../mapping.c
+Module type init error
+This is default settings: 
+set group disks wakeup number to %d, spinup time deno %d
+hdd_backplane null
+Not supported button gpio %d
+Failed to register irq button: %s(%d,%d)
+license=GPL
+description=synobios
+author=Alex Wang
+parm=system_mode:Distinguish in junior mode or system mode
+parmtype=system_mode:int
+parm=check_fan:seconds to delay before using a new device
+parmtype=check_fan:int
+depends=
+vermagic=3.2.101 mod_unload ARMv7 
+/source/synobios/armada/mv_level_button.c
+/source/synobios/armada/mv_level_button.c
+/source/synobios/armada/mv_level_button.c
+/source/synobios/armada/mv_level_button.c
+HDD_Backplane_Status
+hdd_enable
+ds115j_synobios
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+GCC: (GNU) 8.5.0
+aeabi
+.LC0
+.LC1
+syno_ttyS_read
+.LANCHOR0
+.LC3
+.LC2
+.LC8
+.LC7
+.LC6
+.LC5
+.LC4
+.LC9
+.LC11
+.LC14
+.LC10
+.LC13
+.LC12
+.LC17
+.LC16
+.LC15
+.LC18
+.LC19
+.LC20
+.LC21
+state.16622
+save_bytes.16621
+state.16635
+__key.16648
+__key.7648
+synobios_read_proc_cpu_arch
+synobios_read_proc_crypto_hw
+synobios_read_proc_platform_name
+synobios_record_event_new.constprop.3
+scSynoBios
+synobios_error_oom_event
+synobios_raid_sync_event
+synobios_record_raid_event
+synobios_autoremap_raid_event
+synobios_error_fs_event
+synobios_error_fs_btrfs_event
+synobios_error_btrfs_meta_corrupted_event
+synobios_record_ebox_refresh_event
+synobios_disk_retry_report
+synobios_sata_error_report
+synobios_disk_timeout_report
+synobios_disk_reset_fail_report
+synobios_disk_port_lost_report
+synobios_wake_from_deep_sleep
+synobios_record_disk_port_disabled_event
+synobios_record_disk_pwr_reset_event
+synobios_disk_power_short_break_report
+synobios_poll
+.LANCHOR1
+syno_usb_prohibit_event
+syno_console_prohibit_event
+syno_microp_get_event
+synobios_ioctl
+.LC30
+.LC24
+.LC34
+.LC33
+.LANCHOR2
+.LC31
+.LC32
+.LC28
+.LC29
+.LC27
+.LC26
+.LC23
+.LC22
+.LC25
+.LC36
+.LC35
+.LC37
+.LC38
+.LC40
+.LC41
+.LC39
+.LC44
+.LC45
+.LC47
+.LC48
+.LC56
+.LC50
+.LC55
+.LC52
+.LC54
+.LC42
+.LC46
+.LC43
+.LC49
+.LC51
+.LC53
+.LC57
+__func__.29127
+__param_str_system_mode
+__param_str_check_fan
+gSynoCPUMapping
+gSynoCRYPTOMapping
+last_jiffies.29062
+sys_status_lock
+gSynoModelMapping
+synobios_ops
+buzzer_press_count.29063
+micropLogSwitch
+pgSysStatus
+__key.29456
+__mod_license3140
+__mod_description3139
+__mod_author3138
+__mod_system_mode79
+__mod_system_modetype78
+__mod_check_fan75
+__mod_check_fantype74
+__param_system_mode
+__param_check_fan
+__func__.17489
+i2c_bus_no
+uLostAddr.17488
+days_since_epoch
+days_since_leapyear
+days_since_year
+rtc_set_interrupt
+Uninitialize
+GetGpioPin
+SetGpioPin
+HWMONGetHDDBackPlaneStatusByGPIO
+GetBuzzerCleared
+gPWMSpeedMapping
+hwmon_sensor_list
+btn_dsr_handler
+btn_isr_handler
+__module_depends
+__mod_vermagic5
+filp_open
+save_char_from_uart
+GetFanStatusActiveLow
+synobios_lock_ttyS_write_and_read
+free_irq
+rtc_get_alarm_time
+SetDiskLedStatus
+vfs_write
+completion_done
+funcSYNOSendErrorFsEvent
+synobios_fops
+level_button_exit
+syno_ttyS_set_termios
+rtc_mv_get_time
+model_addon_init
+synobios_lock_ttyS_write
+funcSYNODiskTimeoutReport
+synobios_init
+rtc_ricoh_auto_poweron_uninit
+rtc_ricoh_auto_poweron_init
+wait_for_completion_timeout
+i2c_get_adapter
+gSynoBiosEventHead
+proc_synobios_root
+module_type_set
+module_type_get
+gSynoCPUInfoCore
+model_addon_cleanup
+rtc_mv_set_time
+add_card_detect_proc
+__this_module
+SYNO_CTRL_FAN_PERSISTER
+rtc_ricoh_rotate_auto_poweron
+snprintf
+complete
+rtc_seiko_get_time
+syno_sata_mv_gpio_write
+funcSYNOSendErrorFsBtrfsEvent
+funcSYNOMicropGetEvent
+syno_ttyS_close
+funcSYNOSATADiskLedCtrl
+synobios_model_cleanup
+funcSYNOConsoleProhibitEvent
+linuxI2CSmbusRegRead
+funcSYNOSendEboxRefreshEvent
+mvEthPhyRegWrite
+armada_hdd_enable_gpio
+rtc_later_equal_than_int
+synobios_open
+cleanup_module
+SYNOmvRtcExtAlarmClean
+guiWakeupDisksNum
+memcpy
+rtc_mv_auto_poweron_clean
+Seiko_to_Hour
+kfree
+armada_sensor_list
+rtc_get_auto_poweron
+GetFanNum
+__wake_up
+rtc_ricoh_set_time
+funcSYNODiskResetFailReport
+init_module
+funcSYNOSendRaidSyncEvent
+FanStatusMappingType2
+SetGroupWakeConfig
+create_proc_entry
+rtc_seiko_auto_poweron_init
+funcSYNOSendRaidEvent
+GetFanStatusActivePulse
+synobios_release
+rtc_ricoh_get_time
+synobios_record_event
+msecs_to_jiffies
+synobios_rtc_init
+rtc_seiko_time_correction_get
+micropReadList
+GetCPUTemperature
+FanStatusMappingRS409r1
+reverse_bits
+i2c_smbus_xfer
+I2cBusChange
+rtc_mv_rotate_auto_poweron
+kmem_cache_alloc
+giDenoOfTimeInterval
+Hour_to_Ricoh
+rtc_seiko_set_auto_poweron
+linuxI2CCharWrite
+SetHDDActLed
+funcSYNOMetaCorruptedEvent
+rtc_ricoh_set_auto_poweron
+localtime_2
+synobios_lock_ttyS_read
+rtc_ricoh_time_correction_get
+rtc_get_days_later
+rtc_seiko_rotate_auto_poweron
+rtc_ricoh_time_correction_set
+request_threaded_irq
+funcSYNOGetHwCapability
+gPwSched
+gSynoCPUInfoClock
+mvGppPolaritySet
+Ricoh_to_Hour
+mktime
+synobios_event_handler
+funcSYNOSendAutoRemapRaidEvent
+set_disk_led_one
+funcSYNODeepSleepEvent
+mutex_lock
+warn_slowpath_null
+SetPowerLedStatus
+strncmp
+EnablePhyLed
+syno_ttyS_write_with_length
+GetCPUInfo
+try_wakeup_waiting_microp
+mvRtcTimeGet
+update_comp_stat
+rtc_seiko_reset_interrupt_mode
+synobios_cleanup
+printk
+__mutex_init
+mvGppPolarityGet
+axptemp_read_temp
+funcSYNOSendDiskPortLostEvent
+process_synobios_event_list
+rtc_seiko_auto_poweron_uninit
+proc_mkdir
+rtc_mv_set_auto_poweron
+syno_ttyS_open
+GetModel
+PWMFanSpeedMapping
+memset
+funcSYNOSendErrorOOMEvent
+__memzero
+funcSYNOSendDiskPortDisEvent
+kernel_read
+synobios_lock_ttyS_current
+mvEthPhyRegRead
+funcSYNODiskPowerShortBreakReport
+__init_waitqueue_head
+rtc_seiko_time_correction_set
+syno_module
+SYNO_SOC_HDD_LED_SET
+gszSynoHWVersion
+SYNO_CTRL_FAN_STATUS_GET
+funcSYNOSendDiskResetPwrEvent
+FanStatusMappingType1
+strcmp
+armada_hdd_backplane_status
+tty_filp
+SetFanStatus
+synobios_lock_ttyS_protection
+sprintf
+current_tty_buf
+funcSYNOSataErrorReport
+mvRtcTimeSet
+i2c_put_adapter
+mutex_unlock
+funcSynoEunitPowerctlType
+synobios_model_init
+__const_udelay
+funcSYNODiskRetryReport
+GetBrand
+filp_close
+__register_chrdev
+rtc_get_next_weekday
+SetFanSpeedValue
+remove_proc_entry
+save_current_data_from_uart
+Hour_to_Seiko
+i2c_transfer
+GetEUnitType
+localtime_3
+funcSYNOUsbProhibitEvent
+rtc_seiko_set_time
+malloc_sizes
+GetHWMONSupport
+InitModuleType
+remove_card_detect_proc
+SetDiskLedStatusBySataMvGPIO
+do_settimeofday
+giSynoAtaDebug
+strlen
+__copy_to_user
+SYNO_ARMADA_GPIO_PIN
+param_ops_int
+SYNO_CTRL_BUZZER_CLEARED_GET
+syno_get_current
+linuxI2CCharRead
+localtime_1
+mvBoardPhyAddrGet
+SYNOmvRtcExtAlarmSet
+level_button_init
+__copy_from_user
+msleep
+__kmalloc
+SYNO_ENABLE_USB_POWER
+__unregister_chrdev
+.symtab
+.strtab
+.shstrtab
+.note.gnu.build-id
+.rel.text
+.rodata
+.rodata.str1.4
+.modinfo
+.rel__param
+.rodata.str
+.rel__bug_table
+.rel.data
+.rel.gnu.linkonce.this_module
+.bss
+.comment
+.note.GNU-stack
+.ARM.attributes
+6PS$
+Qib(
+;mk
+ZuLG
+PKIJ
+kDB!
