@@ -1,0 +1,14 @@
+[Unit]
+Description=DS115j power-button daemon (reads PIC UART1, powers off on button)
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/syno-powerbtn.sh
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target

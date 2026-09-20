@@ -6,6 +6,8 @@
 
 | Item | State |
 |---|---|
+| USB VBUS fix (2026-09-20) | **FIXED** — DTB now has `regulators/usb-regulator@2` (MPP44, GPIO_ACTIVE_LOW, always-on); **both USB ports live**: flash `13fe:1e00` on usb1 + ASMedia `174c:1153` on usb2; `/dev/sdb` readable at 9.3 MB/s |
+| Power button (2026-09-21) | **daemon deployed, OBSERVE mode** — `syno-powerbtn.service` reads `/dev/ttyS1` read-only. DSM protocol decoded (event_microp.c): button byte = `'0'` **0x30**, pushed asynchronously, scemd reply 7. Arm `TRIGGER_BYTES="30"` after first press capture — see [`POWER-BUTTON.md`](POWER-BUTTON.md) |
 | MUST-1 udev | **PASS** — DTB no `alarm-gpios`; udev ~0.2% after settle; uevent 1779 idle |
 | MUST-2 net | **PASS** — `.233` on `eth0:1` + DHCP `.77`; rgmii-id; networking + dhclient OK |
 | MUST-3 data | **PASS** — `sda3` `/srv/data` rw,noatime |
@@ -19,7 +21,7 @@
 | MUST-11 MCU/LED | **PASS** — ping + this-boot begin/ready/beep; bay amber **off while SMART is healthy** |
 | MUST-12 fan | **PASS on this boot** — wait-loop found hwmon ~6s; pwm never 0; 58 °C sticky at 145 |
 
-`systemctl --failed`: **none**. `qnap_poweroff_ds115j` loaded. sda2 `uImage-ds115j` = TFTP `uImage-ds115j` = `5ea71e0bc69a17ae269e278eedc28288702f1259edffefd97d420e01141ae3e8`.
+`systemctl --failed`: **none**. `qnap_poweroff_ds115j` loaded. sda2 `uImage-ds115j` = `6b58d6eee97005845923167d5fe481035b7031195935bd632cdbe29ae75ed0f6` (USB VBUS fix DTB, 2026-09-20) — ramdisk unchanged `dbbd30ec…`. TFTP `/srv/tftp/uImage-ds115j` still `5ea71e0b…` (previous; promote when convenient).
 
 **Daily-ready: YES** (scoped: no Samba/backups/nftables/burn-in).
 
@@ -80,6 +82,13 @@ sda3  1.8T ext4  LABEL=data    UUID=2fd25b2a-ceb7-4155-bde9-87dec3d66e2b  /srv/d
 ## MCU / fan / LED
 
 - `/usr/local/sbin/syno-mcu.sh ping` OK (`/dev/ttyS1`).
+- **Power button:** `syno-powerbtn.service` (2026-09-21) now listens on `/dev/ttyS1`
+  **read-only** in observe mode. Power-button byte proved from DSM binary:
+  **`0x30` (`'0'`)**, pushed asynchronously by the PIC (scemd `hw_polling.c`
+  `select()`-reader; dispatcher `event_microp.c` replies byte 7).
+  Arm `TRIGGER_BYTES="30"` in `/etc/syno-powerbtn.conf` after the first button-press
+  capture ([`POWER-BUTTON.md`](POWER-BUTTON.md)). Until armed, the button is still
+  power-on-only (as before); poweroff = SSH.
 - `syno-mcu-boot-begin.service` 11:59:35 blink + orange steady; `syno-mcu-boot.service` 12:00:06 ready + beep.
 - `/usr/local/sbin/syno-fan.sh` + `syno-fan.service` (wait-loop proven this boot).
 - Bay LED: `synology:amber:disk` **`trigger=none`, `brightness=0`** while healthy. smartd now runs `/usr/local/sbin/smart-amber-led.sh` for SMART health/attribute failures; `smart-amber-led.timer` reconciles every 15 minutes and clears recovered conditions. The 11:31 UTC `disk-activity` udev rule remains **removed**. Green is hardware SATA. See [`SMART-AMBER-LED.md`](SMART-AMBER-LED.md).

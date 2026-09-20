@@ -49,6 +49,8 @@ Driver: **`/usr/local/sbin/syno-mcu.sh`**. Boot sequence: `syno-mcu-boot-begin.s
 
 **Do NOT send `'1'`** (power-off; kernel module `synology,power-off` handles it) or `'C'` (hard reset) manually. `'A'`/`'B'` (D8 MB LED) not present on DS115j.
 
+**Power button (2026-09-21):** `syno-powerbtn.service` listens on `/dev/ttyS1` **read-only** (observe mode → arm via `/etc/syno-powerbtn.conf`, expected arm byte **`30`** = `'0'`). It never writes; reading the port is safe. Until armed, treat the front button as *power-on only* — poweroff = SSH. Details + the SPI-forensics proof that the button reaches Linux only via the PIC on UART1: [`POWER-BUTTON.md`](POWER-BUTTON.md).
+
 **Bay/HDD LED is bi-color and only half of it is yours.** `synology:amber:disk` (MPP31) is the **amber** half; the **green** half is wired to SATA in hardware. Do **not** attach `disk-activity` (or any activity trigger) to the amber LED — the bay LED then blinks **orange** and hides the normal green. Owner wants the bay LED **green**; keep amber `trigger=none`, `brightness=0` and reserve it for faults. Tried and reverted 2026-09-16.
 
 ## 5. Fan control — temperature-based (never unbind)
