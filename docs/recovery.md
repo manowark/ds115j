@@ -16,7 +16,7 @@ All uImages are Debian 6.12.107 `Linux/ARM` legacy images, load/entry `0x008000`
 
 | Image (sha256[16]) | sda2:/boot (U-Boot source) | helper /srv/tftp | helper artifacts | note |
 |---|---|---|---|---|
-| `6b58d6eee9700584` | **`uImage-ds115j`** (current) | — | `ds115j-usb-build/uImage-ds115j-v2` | **USB VBUS fix (2026-09-20)**: DTB adds `regulators/usb-regulator@2` on **MPP44 (gpio1 pin 12, GPIO_ACTIVE_LOW), always-on**; same kernel zImage (6.12.107), new appended DTB (14 258 B); verified live — both USB ports enumerate, flash readable |
+| `6b58d6eee9700584` | **`uImage-ds115j`** (current) | — | `boot/uImage-ds115j` (this repo) | **USB VBUS fix (2026-09-20)**: DTB adds `regulators/usb-regulator@2` on **MPP44 (gpio1 pin 12, GPIO_ACTIVE_LOW), always-on**; same kernel zImage (6.12.107), new appended DTB (14 258 B); verified live — both USB ports enumerate, flash readable |
 | `5ea71e0bc69a17ae` | `uImage-ds115j.pre-20260920-205106` | `uImage-ds115j` (TFTP default) + `uImage-ds115j.new-noalarm` | `uImage-ds115j.new-noalarm` | previous; **NO alarm-gpios (MUST-1)**; TFTP default promoted 2026-09-16 11:31 UTC |
 | `6b58d6eee9700584` | (history) `uImage-ds115j.pre-20260920-204520` | — | — | intermediate v1 build (had pinctrl mpp44 node — **do not use**, breaks regulator probe) |
 | `c1688fda25f1472d` | `uImage-ds115j.pre-noalarm-20260916` | `uImage-ds115j.pre-alarm-gpios-c1688fda` + `uImage-ds115j.pre-noalarm-20260916` | `uImage-ds115j` | previous; **alarm-gpios present** — do not TFTP-boot as default |

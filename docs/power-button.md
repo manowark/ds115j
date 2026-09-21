@@ -80,8 +80,10 @@ confirms the byte value on this box before arming.
 
 ## Protocol, from the DSM binary
 
-Source: `ds115j-usb-build/hda1-rootfs/usr/syno/bin/scemd` (from the SPI dump's DSM
-rootfs). Symbols resolved via the ELF dynamic relocation table.
+Source: `firmware/spi/scemd` (extracted from the SPI dump's DSM rootfs;
+SHA-256 `45416127ee83108a8ad96d0fe8e21babf84b62030b9923ccdf5eef7484c2b4d5` —
+preserved in this repo so the protocol evidence survives without the analysis box).
+Symbols resolved via the ELF dynamic relocation table.
 
 ### Reader side — how the byte arrives (hw_polling.c)
 
