@@ -54,10 +54,12 @@ NAS_PASS=<password> ./install-optional-tweaks.sh usb
 - Mounts to `/mnt/usb-sdX1` (rw, noatime) on plug-in
 - Lazy-unmounts and removes mount point on unplug
 - Idempotent: safe if the same device triggers udev multiple times
-- **Skips devices already mounted (e.g. by UUID in `/etc/fstab`)**: the helper
-  checks `findmnt /dev/sdX1` before mounting. If the device already has a
-  mountpoint (fstab wins), it exits silently instead of mounting a second
-  copy at `/mnt/usb-*`.
+- **Delegates devices that have an `/etc/fstab` entry** (by UUID): the helper
+  looks up `blkid` UUID and the fstab path, then `systemctl start`s the
+  systemd-escaped mount unit — so the disk mounts only at its canonical fstab
+  path, never as a second `/mnt/usb-*` copy. Falls back to a plain
+  `/mnt/usb-*` mount only if the systemd unit fails.
+- Skips devices already mounted anywhere (fstab mount already done).
 
 ### Why it runs through systemd-run
 
@@ -68,6 +70,14 @@ inside udevd's private name space. The rule therefore wraps the helper with
 `systemd-run`, which escalates to PID 1 and mounts in the global name space.
 This was verified live: the plain rule failed for `sdb4`/`sdc1` on every boot,
 `systemd-run` version mounts them on plug-in.
+
+### Note: USB disks in /etc/fstab
+
+Give an fstab USB line a generous `x-systemd.device-timeout` (e.g. `30s`);
+USB devices report "ready" late, so the default `1s` makes the unit miss the
+device at boot. The automounter then delegates to the fstab unit, so the disk
+ends up mounted at its canonical fstab path (`/srv/usb-tm` in the example
+above) with no `/mnt/usb-*` duplicate.
 
 ### Verify
 

@@ -17,10 +17,20 @@ case "$ACTION" in
       exit 0
     fi
     # Skip if the device is already mounted anywhere (e.g. the same disk is
-    # listed in /etc/fstab by UUID). Mounting one device at two paths with
-    # different options is legal but redundant; fstab wins.
+    # listed in /etc/fstab by UUID and systemd already mounted it).
     if findmnt -rno TARGET "/dev/${DEVICE}" >/dev/null 2>&1; then
       exit 0
+    fi
+    # If the device has an /etc/fstab entry by UUID, delegate to systemd so it
+    # mounts at its canonical fstab path (systemd-escaped unit) instead of
+    # creating a second /mnt/usb-* mount. Fall back to the ordinary mount below
+    # only if the systemd unit fails.
+    UUID="$(blkid -s UUID -o value "/dev/${DEVICE}" 2>/dev/null || true)"
+    if [ -n "$UUID" ]; then
+      FSTAB_POINT="$(awk -v u="$UUID" '$1=="UUID="u {print $2; exit}' /etc/fstab 2>/dev/null || true)"
+      if [ -n "$FSTAB_POINT" ] && systemctl start "$(systemd-escape -p --suffix=mount "$FSTAB_POINT")" 2>/dev/null; then
+        exit 0
+      fi
     fi
     mkdir -p "$MNT"
     # Try rw first; fall back to ro if device is read-only (e.g. USB-RO switch)
