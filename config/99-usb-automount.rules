@@ -1,3 +1,6 @@
 # Auto-mount USB block devices to /mnt/usb-<kernel>
-ACTION=="add", KERNEL=="sd[a-z][0-9]", SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", RUN+="/usr/local/sbin/usb-automount.sh mount %k"
-ACTION=="remove", KERNEL=="sd[a-z][0-9]", SUBSYSTEM=="block", RUN+="/usr/local/sbin/usb-automount.sh umount %k"
+# Run via systemd-run: systemd-udevd has PrivateMounts=yes, so a direct
+# mount(8) from a RUN= program gets EPERM ("permission denied"). systemd-run
+# escalates to PID 1, which mounts in the global name space.
+ACTION=="add", KERNEL=="sd[a-z][0-9]", SUBSYSTEM=="block", DEVPATH=="*usb*", ENV{ID_FS_USAGE}=="filesystem", RUN+="/usr/bin/systemd-run --quiet --collect /usr/local/sbin/usb-automount.sh mount %k"
+ACTION=="remove", KERNEL=="sd[a-z][0-9]", SUBSYSTEM=="block", DEVPATH=="*usb*", RUN+="/usr/bin/systemd-run --quiet --collect /usr/local/sbin/usb-automount.sh umount %k"

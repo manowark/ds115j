@@ -55,6 +55,16 @@ NAS_PASS=<password> ./install-optional-tweaks.sh usb
 - Lazy-unmounts and removes mount point on unplug
 - Idempotent: safe if the same device triggers udev multiple times
 
+### Why it runs through systemd-run
+
+`systemd-udevd.service` ships with `PrivateMounts=yes` on Debian 13. A
+`mount(8)` started directly from a `RUN=` program then fails with
+`mount: ...: permission denied` (EPERM) even as root, because it would mount
+inside udevd's private name space. The rule therefore wraps the helper with
+`systemd-run`, which escalates to PID 1 and mounts in the global name space.
+This was verified live: the plain rule failed for `sdb4`/`sdc1` on every boot,
+`systemd-run` version mounts them on plug-in.
+
 ### Verify
 
 ```bash
