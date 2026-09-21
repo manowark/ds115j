@@ -82,7 +82,8 @@ Root password SSH on this **trusted LAN** is an accepted preference.
 - **No external I2C RTC.** Bus scan empty; `0x30`/`0x32`/`0x68` NACK. Do not add `isl12057@0x68`. `rtc-mv` is the real clock.
 - **Do not `ifdown eth0`** or blindly `systemctl restart networking` from the only SSH session. Preserve `.233`; keep UART as rollback.
 - **Do not overwrite TFTP/current `uImage` from stale copies.**  
-  Current TFTP **and** sda2: SHA-256 `5ea71e0bc69a17ae269e278eedc28288702f1259edffefd97d420e01141ae3e8` (6,060,176 bytes).  
+  Current TFTP **and** sda2: SHA-256 `6b58d6eee97005845923167d5fe481035b7031195935bd632cdbe29ae75ed0f6` (6,060,530 bytes) — the **v2 with USB VBUS fix** (`usb-regulator@2` on MPP44, always-on), verified live 2026-09-20.  
+  Previous no-USB-fix image (no-`alarm-gpios`) `5ea71e0b…` (6,060,176 bytes) — **do not promote**.  
   Previous TFTP default (alarm-gpios), kept: `/srv/tftp/uImage-ds115j.pre-alarm-gpios-c1688fda` = `c1688fda25f1472d4b7b5b65b5ecc2a4d7b8a780cd9d6bb26c7c7df92d1c6a23`.  
   Older `kernel/uImage-ds115j` / `69e60698…` (6,060,240 bytes) — **do not promote**.
 - **Kernel + appended DTB + HDD initramfs + `qnap-poweroff-ds115j.ko` are one set.** Exact vermagic `6.12.107+deb13-armmp`. Do not APT-upgrade the kernel as a normal package update.

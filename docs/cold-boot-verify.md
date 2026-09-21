@@ -1,5 +1,7 @@
 # REBOOT VERIFY — DS115j daily-ready (2026-09-16)
 
+> **⚠ 2026-09-20 UPDATE:** this protocol verified uImage `5ea71e0b…` (no `alarm-gpios`, **no USB fix**). On 2026-09-20 the deployed uImage on sda2/TFTP was **replaced by the v2 with the USB VBUS fix** (`usb-regulator@2` on MPP44, always-on) — SHA-256 `6b58d6eee97005845923167d5fe481035b7031195935bd632cdbe29ae75ed0f6` (6,060,530 B). All rows below that quote `5ea71e0b…` describe the pre-fix state; `boot/`, `README.md`, `docs/install-uart.md` and `docs/landmines.md` now reference the v2 image. Firmware set identity (no `alarm-gpios`, `dbbd30ec…` ramdisk, `qnap-poweroff-ds115j`) is unchanged.
+
 **When:** 2026-09-16 **11:58–12:06 UTC**  
 **NAS:** `ssh root@192.168.68.233`  
 **Helper:** `192.168.68.250`  

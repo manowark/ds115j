@@ -33,13 +33,13 @@ cd boot && shasum -a 256 -c SHA256SUMS
 
 | File | SHA-256 (full) | Role |
 |------|----------------|------|
-| `boot/uImage-ds115j` | `5ea71e0bc69a17ae269e278eedc28288702f1259edffefd97d420e01141ae3e8` | Kernel + **appended DTB, no `alarm-gpios`** |
+| `boot/uImage-ds115j` | `6b58d6eee97005845923167d5fe481035b7031195935bd632cdbe29ae75ed0f6` | Kernel + **appended DTB, no `alarm-gpios`, USB VBUS fix (`usb-regulator@2` on MPP44, always-on)** — the v2 image verified live on 2026-09-20; **this is the only image to deploy** |
 | `boot/uRamdisk-hdd-ds115j` | `dbbd30ec2c3772e2816eaa5e3295b0580a357fc93458dcb3bf063bf7bf65cd75` | Initramfs → `LABEL=rootfs` |
 | `boot/uRamdisk-recovery-ds115j` | `cc9e6bc063a1247c3f370a87238f6ff544ff01ba145aed19f537b13d2810dd96` | BusyBox recovery (fsck) |
 
 Kernel / ramdisk / `modules/qnap-poweroff-ds115j.ko` are **one set**. Vermagic: `6.12.107+deb13-armmp`. Do not `apt upgrade` the kernel as a routine update.
 
-Board DTS (good): `dts/ds115j.dts` SHA `89bc51c8…`. The file `dts/ds115j.dts.stale-with-alarm-gpios` is labelled **do not build**.
+Board DTS (good): `dts/ds115j.dts` SHA `89bc51c8…` — includes the `usb-regulator@2` (MPP44, always-on) VBUS fix. The file `dts/ds115j.dts.stale-with-alarm-gpios` is labelled **do not build**.
 
 ## Layout
 

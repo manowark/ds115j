@@ -31,10 +31,12 @@ Never type `ide 0:1`, never set the fan to `0`, never run `ifdown eth0`, and
 never write SPI (`sf erase`, `sf write`, `bubt`, `fw_setenv`). The default
 boot method below does not use `saveenv`.
 
-Current good images (also in `boot/` of this repo):
+Current good images (also in `boot/` of this repo). The `uImage-ds115j` is the
+**v2 with the USB VBUS fix** (`usb-regulator@2` on MPP44, always-on; no
+`alarm-gpios`) verified live 2026-09-20 — this is the only image to deploy:
 
 ```text
-uImage-ds115j            SHA-256 5ea71e0bc69a17ae269e278eedc28288702f1259edffefd97d420e01141ae3e8
+uImage-ds115j            SHA-256 6b58d6eee97005845923167d5fe481035b7031195935bd632cdbe29ae75ed0f6
 uRamdisk-hdd-ds115j      SHA-256 dbbd30ec2c3772e2816eaa5e3295b0580a357fc93458dcb3bf063bf7bf65cd75
 uRamdisk-recovery-ds115j SHA-256 cc9e6bc063a1247c3f370a87238f6ff544ff01ba145aed19f537b13d2810dd96
 ```
@@ -196,7 +198,7 @@ wget -O /mnt/boot/uImage-ds115j \
   http://192.168.68.251:45152/boot/uImage-ds115j
 wget -O /mnt/boot/uRamdisk-hdd-ds115j \
   http://192.168.68.251:45152/boot/uRamdisk-hdd-ds115j
-echo '5ea71e0bc69a17ae269e278eedc28288702f1259edffefd97d420e01141ae3e8  /mnt/boot/uImage-ds115j' | sha256sum -c -
+echo '6b58d6eee97005845923167d5fe481035b7031195935bd632cdbe29ae75ed0f6  /mnt/boot/uImage-ds115j' | sha256sum -c -
 echo 'dbbd30ec2c3772e2816eaa5e3295b0580a357fc93458dcb3bf063bf7bf65cd75  /mnt/boot/uRamdisk-hdd-ds115j' | sha256sum -c -
 sync
 umount /mnt
