@@ -253,6 +253,7 @@ certificates. It installs trixie/updates/security apt sources, the DHCP +
 | HDD idle | `disk-idle.service` (`hdparm -S 120` = 10 min) via `scripts/install-disk-idle.sh` |
 | Soft poweroff | `modules/qnap-poweroff-ds115j.ko` + `modules-load.d` |
 | Power button | `syno-powerbtn.sh` + `syno-powerbtn.service` + `syno-powerbtn.conf` (armed `30`), `syno-powerbtn-arm.sh` + `.service` (PIC arming at boot) — see `docs/power-button.md` |
+| DSM parity tuning | `90-ds115j-tune.conf` (sysctl), `usbcore-autosuspend-off.conf`, `90-ds115j-watchdog.conf` (SoC watchdog via systemd), `rtc-power-schedule.sh` — see `docs/dsm-os-features.md` |
 | Base services | `chrony`, `zramswap`, `smartmontools`, `dbus`, `networking` |
 
 The power-button daemon ships **armed** (`TRIGGER_BYTES="30"` in `config`…/`scripts/syno-powerbtn.conf`): the front button performs a clean `poweroff` via `qnap_poweroff_ds115j`. Verified live 2026-09-21: the PIC reports `0x30` on a press and the arming **survives power-off** (PIC stays on a standby rail). The `syno-powerbtn-arm` boot unit re-sends the DSM rc bytes (`echo 4`/`echo 9`) defensively after every boot (idempotent; needed only if the PIC ever loses its latched state, e.g. after a long wall-power loss).
@@ -333,6 +334,9 @@ systemctl is-active disk-idle.service
 systemctl is-active syno-powerbtn.service syno-powerbtn-arm.service
 grep '^TRIGGER_BYTES=' /etc/syno-powerbtn.conf   # "30" = armed
 journalctl -u syno-powerbtn --no-pager -n 3      # "ARMED, trigger byte(s): 30"
+sysctl net.core.somaxconn                        # 65535 (DSM parity)
+cat /sys/module/usbcore/parameters/autosuspend   # -1 (USB storage never sleeps)
+cat /etc/systemd/system.conf.d/90-ds115j-watchdog.conf 2>/dev/null | grep -c RuntimeWatchdogSec  # 1 (applies next boot)
 hdparm -C /dev/sda           # active/idle just after boot; standby after 10+ min quiet
 /usr/local/sbin/syno-mcu.sh ping
 lsmod | grep qnap_poweroff

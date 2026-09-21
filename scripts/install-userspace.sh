@@ -36,6 +36,10 @@ for required in \
     scripts/install-disk-idle.sh \
     config/ds115j-modules.conf \
     config/qnap-poweroff-ds115j.conf \
+    config/90-ds115j-tune.conf \
+    config/usbcore-autosuspend-off.conf \
+    config/90-ds115j-watchdog.conf \
+    scripts/rtc-power-schedule.sh \
     modules/qnap-poweroff-ds115j.ko
 do
     if [ ! -f "$ROOT/$required" ]; then
@@ -45,8 +49,9 @@ do
 done
 
 install -d /usr/local/sbin /etc/systemd/system /etc/systemd/network \
-    /etc/systemd/journald.conf.d /etc/modules-load.d /etc/network \
-    /etc/default /srv/data "/lib/modules/$KVER/extra"
+    /etc/systemd/journald.conf.d /etc/systemd/system.conf.d \
+    /etc/modules-load.d /etc/modprobe.d /etc/sysctl.d \
+    /etc/network /etc/default /srv/data "/lib/modules/$KVER/extra"
 
 # Install boot-critical configuration before package setup. Do not restart
 # networking here: doing so can drop the only SSH session. These settings are
@@ -106,6 +111,20 @@ install -m 0644 "$ROOT/config/qnap-poweroff-ds115j.conf" \
     /etc/modules-load.d/qnap-poweroff-ds115j.conf
 install -m 0644 "$ROOT/config/ds115j-modules.conf" \
     /etc/modules-load.d/ds115j.conf
+
+# DSM parity tuning (docs/dsm-os-features.md): sysctl, USB autosuspend off,
+# SoC watchdog feed. watchdog + usbcore take effect at next boot by design.
+install -m 0644 "$ROOT/config/90-ds115j-tune.conf" \
+    /etc/sysctl.d/90-ds115j-tune.conf
+sysctl -q -p /etc/sysctl.d/90-ds115j-tune.conf || true
+install -m 0644 "$ROOT/config/usbcore-autosuspend-off.conf" \
+    /etc/modprobe.d/usbcore-autosuspend-off.conf
+if [ -w /sys/module/usbcore/parameters/autosuspend ]; then
+    echo -1 > /sys/module/usbcore/parameters/autosuspend 2>/dev/null || true
+fi
+install -m 0644 "$ROOT/config/90-ds115j-watchdog.conf" \
+    /etc/systemd/system.conf.d/90-ds115j-watchdog.conf
+install -m 0755 "$ROOT/scripts/rtc-power-schedule.sh" /usr/local/sbin/rtc-power-schedule.sh
 
 install -m 0644 "$ROOT/modules/qnap-poweroff-ds115j.ko" \
     "/lib/modules/$KVER/extra/qnap-poweroff-ds115j.ko"
