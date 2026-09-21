@@ -54,6 +54,10 @@ NAS_PASS=<password> ./install-optional-tweaks.sh usb
 - Mounts to `/mnt/usb-sdX1` (rw, noatime) on plug-in
 - Lazy-unmounts and removes mount point on unplug
 - Idempotent: safe if the same device triggers udev multiple times
+- **Skips devices already mounted (e.g. by UUID in `/etc/fstab`)**: the helper
+  checks `findmnt /dev/sdX1` before mounting. If the device already has a
+  mountpoint (fstab wins), it exits silently instead of mounting a second
+  copy at `/mnt/usb-*`.
 
 ### Why it runs through systemd-run
 

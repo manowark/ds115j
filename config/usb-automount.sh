@@ -12,8 +12,14 @@ MNT="/mnt/usb-${DEVICE}"
 
 case "$ACTION" in
   mount)
-    # Idempotent: skip if already mounted
+    # Idempotent: skip if already mounted at our target path
     if mountpoint -q "$MNT" 2>/dev/null; then
+      exit 0
+    fi
+    # Skip if the device is already mounted anywhere (e.g. the same disk is
+    # listed in /etc/fstab by UUID). Mounting one device at two paths with
+    # different options is legal but redundant; fstab wins.
+    if findmnt -rno TARGET "/dev/${DEVICE}" >/dev/null 2>&1; then
       exit 0
     fi
     mkdir -p "$MNT"
