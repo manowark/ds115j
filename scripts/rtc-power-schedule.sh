@@ -9,16 +9,14 @@
 #   rtc-power-schedule.sh clear         remove any armed alarm
 #   rtc-power-schedule.sh status        show current alarm
 #
-# IMPORTANT (2026-09-21): NOT yet verified live. It is unknown whether the
-# RTC alarm line actually wakes the DS115j from a *software power-off*
-# (qnap_poweroff_ds115j cuts the PSU; the PIC then owns power-on). Some units
-# only wake from alarm when the PSU stays alive (hard power button on) or via
-# the PIC's own RTC. Do the live test at the box BEFORE relying on it:
-#   echo 0 > /sys/class/rtc/rtc0/wakealarm   # disarm
-#   sh rtc-power-schedule.sh +2              # arm
-#   poweroff                                 # then wait 2 min
-# If the box comes back on its own -> works; otherwise it is equivalent to a
-# soft off until the button is pressed.
+# LIVE-TESTED 2026-09-21 — **DOES NOT WAKE THE BOX.** Armed +3 min, ran
+# `poweroff` (qnap_poweroff_ds115j → PIC cuts the PSU): the box stayed off and
+# the alarm register was cleared on next boot. Cause: a full PSU cut also kills
+# the SoC-internal RTC alarm path (DSM's "auto power on" instead keeps the SoC
+# in a low-power halt with the RTC alive). The RTC *calendar* DOES survive a
+# full power cut (coin-cell/supercap standby rail) — this tool is still useful
+# to arm the alarm for reports, but keep expectations: the DS115j with our
+# poweroff chain will NOT power itself on from a scheduled RTC alarm.
 set -u
 
 RTC=/sys/class/rtc/rtc0

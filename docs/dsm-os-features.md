@@ -16,7 +16,7 @@ Legend: ✅ replicated on our Debian · ⚠️ replicated but different · 🆕 
 | **Fan control** | `synobios SetFanStatus/PWMFanSpeedMapping`; `support_fan=yes`, `support_fan_adjust_dual_mode=yes` | ✅ | `syno-fan` (SoC hwmon `pwm1`, temp curve). Dual mode (auto/manual) not needed — always auto |
 | **CPU clock** | U-Boot env, `cpuclk` | ✅ | **800 MHz confirmed live** (`clk_summary`: `cpuclk 800000000`, DDR 200 MHz). `BogoMIPS 33.33` is bogus ARM calibration, ignore it |
 | **RTC** | `rtc-mv`; `nanotime` wake | ✅ | `rtc0` + `wakealarm` present, `hctosys` works, chrony syncs |
-| **RTC alarm / auto power-on** | `support_auto_poweron=yes`, `supportrcpower=yes`, `synotimecontrol` | 🆕 | DSM "Power Schedule" turns the box on at set times; our `rtc0/wakealarm` is writable. Needs a live test whether alarm actually pulls the PSU on this unit |
+| **RTC alarm / auto power-on** | `support_auto_poweron=yes`, `supportrcpower=yes`, `synotimecontrol` | ✖️ | **LIVE-TESTED 2026-09-21 — DOES NOT WORK with our poweroff path.** Armed `wakealarm` for +3 min (@12:40:30 UTC), ran `poweroff` (PIC PSU-cut), box stayed off. After the next button power-on the alarm register was cleared. **However the RTC *calendar* survives a full PSU cut** (hwclock correct after cold boot — coin-cell/supercap on the standby rail) — only the SoC-internal alarm line fails to wake a fully-PSU-cut board (in DSM, "auto power on" relies on a low-power SoC halt state instead of full PSU cut). Tool kept in repo as a manual convenience; don't rely on it for scheduled wake.
 | **Watchdog** | (DSM does not feed it either) | 🆕 | SoC **Orion Watchdog** present at `/dev/watchdog0` (timeout 257 s, currently `inactive` — nothing feeds it). Enabling `RuntimeWatchdogSec` makes a hung kernel reboot instead of staying dead |
 | **USB VBUS** | DTB `usb-regulator@2` (MPP44) | ✅ | `usb-vbus-fix` |
 | **USB autosuspend** | DSM keeps storage awake | ⚠️/🆕 | Our kernel: `usbcore.autosuspend=2` (module param 2 s). Both attached devices currently `control=on`; make it permanent: `options usbcore autosuspend=-1` |
@@ -70,7 +70,10 @@ kernel — **skip**, our userspace handles their functions.
    `RuntimeWatchdogSec=60` → Orion watchdog feeds; a hard kernel hang reboots
    the NAS ~60 s later instead of leaving it dead until a manual power-cycle.
    Applied on next boot (systemd reads system.conf.d at manager start).
-4. RTC power-schedule script (`scripts/rtc-power-schedule.sh`) — manual tool;
-   **live test at the box required** before it can be considered working.
+4. RTC power-schedule script (`scripts/rtc-power-schedule.sh`) — manual tool
+   (`wakealarm` read/write). **LIVE-TESTED 2026-09-21: does NOT wake the box**
+   after a full PSU cut (our poweroff kills the SoC RTC alarm line; only the
+   RTC calendar keeps time on the standby rail). Do not rely on it for
+   scheduled wake-ups. Keep the script = harmless RTC utility.
 
 Revert = delete the file / reset sysctl. None of them writes to the PIC.
