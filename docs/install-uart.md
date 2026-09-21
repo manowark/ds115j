@@ -338,7 +338,7 @@ grep '^TRIGGER_BYTES=' /etc/syno-powerbtn.conf   # "30" = armed
 journalctl -u syno-powerbtn --no-pager -n 3      # "ARMED, trigger byte(s): 30"
 sysctl net.core.somaxconn                        # 65535 (DSM parity)
 cat /sys/module/usbcore/parameters/autosuspend   # -1 (USB storage never sleeps)
-cat /etc/systemd/system.conf.d/90-ds115j-watchdog.conf 2>/dev/null | grep -c RuntimeWatchdogSec  # 1 (applies next boot)
+cat /sys/class/watchdog/watchdog0/state           # active (systemd feeds; 60 s timeout)
 hdparm -C /dev/sda           # active/idle just after boot; standby after 10+ min quiet
 /usr/local/sbin/syno-mcu.sh ping
 lsmod | grep qnap_poweroff
