@@ -19,6 +19,13 @@ BAUD=9600
 SETTLE_SEC=60      # ignore triggers for N seconds after start (boot-time MCU chatter)
 DEBOUNCE_SEC=30    # minimum seconds between two poweroff triggers
 TRIGGER_BYTES=""   # empty = observe mode; otherwise space-separated hex bytes, e.g. "45"
+# OPEN_RW=1 holds the port O_RDWR|O_NOCTTY (scemd's read-write mode; bash `<>` does
+# not set O_NONBLOCK, and we deliberately do NOT want it: our read loop is a blocking
+# `dd`, unlike scemd's select()+O_NONBLOCK). O_RDWR vs O_RDONLY is the variable under
+# test — whether modem-line (RTS/DTR) state differs for the PIC. Default 0 = O_RDONLY.
+# Still never writes a byte. Live evidence: press @07:19 UTC gave 0 bytes under
+# O_RDONLY; scemd (which receives button events in DSM) never opens the port read-only.
+OPEN_RW=0
 
 [ -r "$CONF" ] && . "$CONF"
 
@@ -36,9 +43,19 @@ if ! stty -F "$TTY" "$BAUD" raw -echo -onlcr -icrnl -ixon -ixoff cs8 -cstopb \
   exit 3
 fi
 
-if ! exec 3<"$TTY"; then
-  echo "syno-powerbtn: cannot open $TTY for reading" >&2
-  exit 4
+if [ "$OPEN_RW" = "1" ]; then
+  # Match scemd's open mode: O_RDWR (scemd uses 0x902 = O_RDWR|O_NOCTTY|O_NONBLOCK,
+  # but our read loop is blocking, so no O_NONBLOCK here).
+  if ! exec 3<>"$TTY"; then
+    echo "syno-powerbtn: cannot open $TTY O_RDWR (scemd-style) for reading" >&2
+    exit 4
+  fi
+  echo "[$(date '+%F %T')] port opened O_RDWR (scemd-style)"
+else
+  if ! exec 3<"$TTY"; then
+    echo "syno-powerbtn: cannot open $TTY for reading" >&2
+    exit 4
+  fi
 fi
 
 START=$(date +%s)

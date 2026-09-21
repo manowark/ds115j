@@ -81,6 +81,8 @@ install -m 0755 \
     "$ROOT/scripts/syno-fan.sh" \
     "$ROOT/scripts/smart-amber-led.sh" \
     "$ROOT/scripts/deploy-boot.sh" \
+    "$ROOT/scripts/syno-powerbtn.sh" \
+    "$ROOT/scripts/syno-powerbtn-arm.sh" \
     /usr/local/sbin/
 
 # keep a copy next to historical /root/deploy-boot.sh path
@@ -93,6 +95,8 @@ install -m 0644 \
     "$ROOT/scripts/smart-amber-led.service" \
     "$ROOT/scripts/smart-amber-led.timer" \
     "$ROOT/scripts/disk-idle.service" \
+    "$ROOT/scripts/syno-powerbtn.service" \
+    "$ROOT/scripts/syno-powerbtn-arm.service" \
     /etc/systemd/system/
 
 backup_once /etc/smartd.conf
@@ -130,6 +134,14 @@ systemctl enable --now chrony.service zramswap.service smartmontools.service
 systemctl restart chrony.service zramswap.service smartmontools.service
 systemctl enable --now syno-mcu-boot-begin.service syno-mcu-boot.service \
     syno-fan.service smart-amber-led.timer
+
+# Power button: PIC arming (rc boot bytes) then the read-only poweroff listener.
+# syno-powerbtn stays in OBSERVE mode unless /etc/syno-powerbtn.conf sets
+# TRIGGER_BYTES (e.g. "30"). The arm unit writes only the two OEM LED-init bytes.
+if [ -f "$ROOT/scripts/syno-powerbtn.conf" ]; then
+    install -m 0644 "$ROOT/scripts/syno-powerbtn.conf" /etc/syno-powerbtn.conf
+fi
+systemctl enable --now syno-powerbtn-arm.service syno-powerbtn.service
 
 # dbus.service is static on Debian, so wire it exactly as on the proven box.
 if [ -e /usr/lib/systemd/system/dbus.service ]; then

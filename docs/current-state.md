@@ -7,7 +7,7 @@
 | Item | State |
 |---|---|
 | USB VBUS fix (2026-09-20) | **FIXED** — DTB now has `regulators/usb-regulator@2` (MPP44, GPIO_ACTIVE_LOW, always-on); **both USB ports live**: flash `13fe:1e00` on usb1 + ASMedia `174c:1153` on usb2; `/dev/sdb` readable at 9.3 MB/s |
-| Power button (2026-09-21) | **daemon deployed, OBSERVE mode** — `syno-powerbtn.service` reads `/dev/ttyS1` read-only. DSM protocol decoded (event_microp.c): button byte = `'0'` **0x30**, pushed asynchronously, scemd reply 7. Arm `TRIGGER_BYTES="30"` after first press capture — see [`POWER-BUTTON.md`](POWER-BUTTON.md) |
+| Power button (2026-09-21) | **✅ WORKING, ARMED, VERIFIED LIVE** — `syno-powerbtn.service` + `syno-powerbtn-arm.service`. Press-and-hold ~2 s → PIC `0x30` → clean `poweroff` via `qnap_poweroff_ds115j` (proven twice; arming survives power-off). Config: `TRIGGER_BYTES="30"`, `SETTLE_SEC=60`. See [`power-button.md`](power-button.md) |
 | MUST-1 udev | **PASS** — DTB no `alarm-gpios`; udev ~0.2% after settle; uevent 1779 idle |
 | MUST-2 net | **PASS** — `.233` on `eth0:1` + DHCP `.77`; rgmii-id; networking + dhclient OK |
 | MUST-3 data | **PASS** — `sda3` `/srv/data` rw,noatime |
@@ -82,13 +82,18 @@ sda3  1.8T ext4  LABEL=data    UUID=2fd25b2a-ceb7-4155-bde9-87dec3d66e2b  /srv/d
 ## MCU / fan / LED
 
 - `/usr/local/sbin/syno-mcu.sh ping` OK (`/dev/ttyS1`).
-- **Power button:** `syno-powerbtn.service` (2026-09-21) now listens on `/dev/ttyS1`
-  **read-only** in observe mode. Power-button byte proved from DSM binary:
-  **`0x30` (`'0'`)**, pushed asynchronously by the PIC (scemd `hw_polling.c`
-  `select()`-reader; dispatcher `event_microp.c` replies byte 7).
-  Arm `TRIGGER_BYTES="30"` in `/etc/syno-powerbtn.conf` after the first button-press
-  capture ([`POWER-BUTTON.md`](POWER-BUTTON.md)). Until armed, the button is still
-  power-on-only (as before); poweroff = SSH.
+- **Power button:** `syno-powerbtn.service` + `syno-powerbtn-arm.service`
+  (2026-09-21) — **armed and VERIFIED live**: `/etc/syno-powerbtn.conf`
+  `TRIGGER_BYTES="30"`, `SETTLE_SEC=60`, `DEBOUNCE_SEC=30`. Press-and-hold ~2 s →
+  PIC pushes **`0x30` (`'0'`)** → daemon logs `POWER BUTTON detected` → `systemctl
+  poweroff` → `qnap_poweroff_ds115j.ko` cuts the PSU (clean hardware power-off).
+  Proven: byte captured twice, armed press powered the box off twice, and the
+  arming **survives power-off** (PIC standby rail; the arm unit re-sends the DSM
+  rc bytes `echo 4`/`echo 9` defensively at boot). The daemon reads `/dev/ttyS1`
+  **read-only** and never writes. Details + SPI-forensics proof that the button
+  reaches Linux only via the PIC on UART1: [`power-button.md`](power-button.md).
+  If the button ever stops working after a long wall-power loss, re-run
+  `/usr/local/sbin/syno-powerbtn-arm.sh`.
 - `syno-mcu-boot-begin.service` 11:59:35 blink + orange steady; `syno-mcu-boot.service` 12:00:06 ready + beep.
 - `/usr/local/sbin/syno-fan.sh` + `syno-fan.service` (wait-loop proven this boot).
 - Bay LED: `synology:amber:disk` **`trigger=none`, `brightness=0`** while healthy. smartd now runs `/usr/local/sbin/smart-amber-led.sh` for SMART health/attribute failures; `smart-amber-led.timer` reconciles every 15 minutes and clears recovered conditions. The 11:31 UTC `disk-activity` udev rule remains **removed**. Green is hardware SATA. See [`SMART-AMBER-LED.md`](SMART-AMBER-LED.md).

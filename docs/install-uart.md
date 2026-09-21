@@ -252,7 +252,10 @@ certificates. It installs trixie/updates/security apt sources, the DHCP +
 | SMART amber | `smart-amber-led.sh` + timer/service + `config/smartd.conf` (`-n standby,q`, 1 h timer) |
 | HDD idle | `disk-idle.service` (`hdparm -S 120` = 10 min) via `scripts/install-disk-idle.sh` |
 | Soft poweroff | `modules/qnap-poweroff-ds115j.ko` + `modules-load.d` |
+| Power button | `syno-powerbtn.sh` + `syno-powerbtn.service` + `syno-powerbtn.conf` (armed `30`), `syno-powerbtn-arm.sh` + `.service` (PIC arming at boot) — see `docs/power-button.md` |
 | Base services | `chrony`, `zramswap`, `smartmontools`, `dbus`, `networking` |
+
+The power-button daemon ships **armed** (`TRIGGER_BYTES="30"` in `config`…/`scripts/syno-powerbtn.conf`): the front button performs a clean `poweroff` via `qnap_poweroff_ds115j`. Verified live 2026-09-21: the PIC reports `0x30` on a press and the arming **survives power-off** (PIC stays on a standby rail). The `syno-powerbtn-arm` boot unit re-sends the DSM rc bytes (`echo 4`/`echo 9`) defensively after every boot (idempotent; needed only if the PIC ever loses its latched state, e.g. after a long wall-power loss).
 
 The installer never restarts networking, so it does not drop the current UART
 or SSH session. Reboot and type the same U-Boot commands once more to apply all
@@ -327,6 +330,9 @@ systemctl is-active networking chrony zramswap smartmontools dbus
 systemctl is-active syno-fan.service syno-mcu-boot-begin.service
 systemctl is-active syno-mcu-boot.service smart-amber-led.timer
 systemctl is-active disk-idle.service
+systemctl is-active syno-powerbtn.service syno-powerbtn-arm.service
+grep '^TRIGGER_BYTES=' /etc/syno-powerbtn.conf   # "30" = armed
+journalctl -u syno-powerbtn --no-pager -n 3      # "ARMED, trigger byte(s): 30"
 hdparm -C /dev/sda           # active/idle just after boot; standby after 10+ min quiet
 /usr/local/sbin/syno-mcu.sh ping
 lsmod | grep qnap_poweroff
@@ -340,16 +346,18 @@ test -n "$PWM" && test "$(cat "$PWM")" -gt 0
 
 The ready state is: blue power steady, status green steady after one short
 beep, bay green controlled by SATA, bay amber off while SMART is healthy. The
-fan must never read `0`. `poweroff` is expected to cut PSU power through
-`qnap_poweroff_ds115j`; test it only while physically present to press the
-front power button afterward.
+fan must never read `0`. The **front power button performs a clean power-off**
+(armed daemon reads `0x30` from the PIC and runs `systemctl poweroff`, which
+cuts PSU power through `qnap_poweroff_ds115j`); test it only while physically
+present to press the button afterward to power the NAS back on.
 
 ## 10. Daily-ready result
 
 When every §9 check passes, the NAS is daily-ready: local HDD boot, DHCP plus
 permanent `.233`, `/srv/data`, working trixie apt, SMART monitoring and amber
 fault indication, 10-minute HDD spin-down (`docs/disk-idle.md`), chrony, zram,
-MCU boot/ready LEDs and beep, temperature fan control, and the soft-poweroff
-module. The only external requirement after rootfs extraction is Internet
-access for the explicit apt installation. Journald is volatile (logs gone on
-reboot) so the disk can sleep.
+MCU boot/ready LEDs and beep, temperature fan control, the soft-poweroff
+module, and a **front power button that cleanly powers the NAS off**
+(`docs/power-button.md`). The only external requirement after rootfs extraction
+is Internet access for the explicit apt installation. Journald is volatile
+(logs gone on reboot) so the disk can sleep.

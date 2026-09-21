@@ -1,12 +1,48 @@
 # POWER BUTTON — DS115j front power-button daemon (2026-09-21)
 
-**Status:** the DSM byte protocol is now **fully decoded from the official scemd
-binary** (see [Protocol, from the DSM binary](#protocol-from-the-dsm-binary)). The
-power-button byte is **`0x30` (`'0'`)**, pushed **asynchronously** by the PIC on
-ttyS1 — DSM never sends a request/poll byte for it (its reader is `select()`-based).
-The daemon is **deployed in OBSERVE mode** (logs every byte, never powers off). One
-owner-side step remains: press the button once to confirm the live byte, arm
-`TRIGGER_BYTES="30"`, re-test. See [Verification](#verification-when-you-are-at-the-box).
+**Status: ✅ FULLY WORKING — verified live 2026-09-21.** The front power button now
+performs a clean `poweroff` on Debian 13 (armv7l). Complete verified chain:
+
+```
+press-and-hold ~2 s → PIC16LF1828 pushes 0x30 on /dev/ttyS1 (9600 8N1)
+→ syno-powerbtn (ARMED, TRIGGER_BYTES="30") logs "POWER BUTTON detected"
+→ sleep 2 → systemctl poweroff → qnap-poweroff-ds115j.ko poweroff-notifier
+→ PIC cuts PSU → hardware power-off confirmed on the box
+```
+
+Live evidence (all at the box, 2026-09-21):
+- 11:18:00 — `byte 0x30` on **first** press (after sending the rc boot bytes,
+  see below) — first PIC→host byte ever seen under Debian.
+- 11:19:32 — `byte 0x30` again on a **second** press (repeatability confirmed).
+- ~11:21 — armed to `TRIGGER_BYTES="30"`, press → **clean hardware power-off.**
+
+**Arming requirement (H1 — CONFIRMED):** the PIC reports the button only after the
+host sends the DSM rc boot bytes with a trailing newline — `echo 4 > /dev/ttyS1`
+(`0x34 0x0A`, power LED on) then `echo 9 > /dev/ttyS1` (`0x39 0x0A`, status/LED state).
+These exact newline-terminated writes exist in DSM's `/etc/rc`
+(`SupportLedBehaviorV2` branch); Debian's syno-mcu had sent the same *bare* bytes
+(no `\n`) which the LED visibly executed but which did **not** arm button reporting.
+Only after the newline-form writes did the PIC start pushing `0x30`.
+(The earlier live press @07:19 UTC — before any rc-bytes replication — produced
+0 bytes.)
+
+**Falsified along the way (no button press needed):**
+- ~~**"PIC pushes spontaneously with zero init"**~~ — falsified by the 07:19 press
+  giving 0 bytes while the daemon had never sent the rc boot bytes.
+- ~~**O_RDWR open-mode hold (scemd's 0x902)**~~ — falsified 2026-09-21 by a live
+  TIOCMGET (`scripts/ttymode-diag.pl`): O_RDONLY vs O_RDWR|O_NOCTTY|O_NONBLOCK vs
+  O_RDWR|O_NOCTTY all report identical `TIOCM=0x4146` (DTR, RTS, CD, DSR asserted),
+  so a read-only daemon already holds the modem lines exactly like scemd.
+- ~~**`syno_led_mask_on` boot step writes a ttyS1 byte**~~ — resolved: it issues
+  ioctl `SYNOIO_LED_DISK_MASK` (`0xc0104b0a`) which dispatches through the synobios
+  service table to disk-LED functions (`set_disk_led_one`/`SetDiskLedStatus`/
+  `funcSYNOSATADiskLedCtrl`) that drive SoC GPIO / SATA-chip registers
+  (`SYNO_SOC_HDD_LED_SET`) — never `syno_ttyS_write`. synobios is rmmod'd right
+  after in rc, so the **only host→PIC bytes in all of DSM boot+runtime are rc's
+  `echo 4`/`echo 9`**.
+
+Live test kit (button press required, at the box) is below under
+[Verification](#verification-when-you-are-at-the-box).
 
 ## Context
 
@@ -60,7 +96,9 @@ fds (+ an OpenBiosDev fd). **No request byte is ever sent before reading.**
 
 The polling loop `0x214fc` then does `dequeue(key=4)`; when size==1 it loads the byte
 and calls the dispatcher `0x21020`. So a raw 1-byte event that lands on ttyS1 is
-forwarded untouched. There is **no poll/arm byte** in this path — the PIC pushes.
+forwarded untouched. There is **no poll/arm byte in scemd** — but note: the PIC
+still needs the *rc boot-time* host writes (`echo 4`, `echo 9`) before it starts
+reporting (proven live 2026-09-21, see header).
 
 ### Dispatcher byte map (event_microp.c)
 
@@ -121,37 +159,44 @@ journalctl -u syno-powerbtn -f        # live byte log from the PIC
 Every byte the PIC sends is logged as `byte 0xNN`; consecutive bytes (gap ≤ 1 s) are
 grouped into `MCU sequence: NN MM …` lines.
 
-## Verification — when you are at the box
+## Verification — ✅ DONE at the box 2026-09-21
 
-1. SSH in and watch the log:
+The full chain was verified live (see header): two `byte 0x30` press confirmations,
+then arming `TRIGGER_BYTES="30"` → clean hardware power-off. **If you ever need to
+re-prove it after a reinstall**, the exact steps that worked:
+
+1. Daemon in OBSERVE mode: `systemctl is-active syno-powerbtn`, then
+   `journalctl -u syno-powerbtn -f`.
+2. **Arming (required!) — send the DSM rc boot bytes once, newline-form:**
    ```bash
-   journalctl -u syno-powerbtn -f
+   ssh root@192.168.68.233 'echo 4 > /dev/ttyS1; sleep 1; echo 9 > /dev/ttyS1'
    ```
-2. **Press the front power button once.**
-3. Read what arrived. Per the DSM binary the press byte is **`0x30`**; expect the log
-   lines `byte 0x30` (maybe `MCU sequence: 30`). The press is pushed asynchronously —
-   no request was sent, the PIC decides to speak.
-   - **`byte 0x30` appears** → matches the OEM map; arm and re-test.
-   - **A different byte** appears (e.g. a short sequence) → arm the *first* byte of the
-     press sequence. Record it and tell me — the byte map says `'0'`, live data wins.
-   - **Nothing appears** → the PIC apparently needs DSM's kernel module side
-     (synobios.ko owns a boot-time handshake on ttyS1 that we don't reproduce). Stop,
-     tell me. Do **not** guess request bytes on the live box.
-4. Arm the trigger with the captured byte(s) and restart:
-   ```bash
-   sed -i 's/^TRIGGER_BYTES=.*/TRIGGER_BYTES="30"/' /etc/syno-powerbtn.conf
-   systemctl restart syno-powerbtn
-   journalctl -u syno-powerbtn -n 5        # should say "ARMED, trigger byte(s): 30"
-   ```
-5. Re-test: press the button once more → the box should log `POWER BUTTON
-   detected (byte 0x30) — poweroff in 2s` and power off cleanly (kernel
-   `qnap_poweroff_ds115j` then tells the PIC to cut the PSU).
+   (0x34 0x0A + 0x39 0x0A; the blue LED starts blinking — expected, that is the PIC
+   executing 0x39's state).
+3. Press-and-hold the front button ~2 s → journal shows `byte 0x30`.
+4. Arm: `sed -i 's/^TRIGGER_BYTES=.*/TRIGGER_BYTES="30"/' /etc/syno-powerbtn.conf` +
+   `systemctl restart syno-powerbtn` → log must say `ARMED, trigger byte(s): 30`.
+5. Press-and-hold again → `POWER BUTTON detected (byte 0x30) — poweroff in 2s` →
+   clean PSU cut via `qnap_poweroff_ds115j.ko`.
+
+**Persistence — PROVEN 2026-09-21:** after the clean power-off, the NAS was
+booted again with **no** rc bytes re-sent, and the very first press powered it
+off cleanly again. The PIC keeps its armed state across a soft power-off
+(`qnap_poweroff_ds115j` cuts the main PSU rail, but the PIC lives on a
+standby rail that stays up — it is the unit that powers the box back on).
+No reboot re-arming is needed.
+
+Still, `scripts/syno-powerbtn-arm.sh` + `syno-powerbtn-arm.service` are
+installed and enabled (idempotent, only the two OEM LED-init bytes): they cover
+the one untested corner where the PIC could lose its latched state — a full
+**wall-power loss long enough to drain its standby rail** (unplug/storm/PSU
+brick always requires a *long* blackout before arguing about it; if the box
+ever boots with the button dead, re-run the arm unit and it is fixed).
 
 Notes:
 - Per the DSM binary the press byte is **`0x30`** (event_microp.c, `'0'` = power
-  button pressed). Use exactly the byte(s) observed on the *press* lines; a
-  multi-byte press sequence can be armed as `TRIGGER_BYTES="30 30"` (any byte in the
-  set triggers).
+  button pressed), confirmed empirically. A multi-byte press sequence can be armed
+  as `TRIGGER_BYTES="30 30"` (any byte in the set triggers).
 - If a tested arming byte ever fires spuriously (e.g. the rear reset button shares
   it), revert to `TRIGGER_BYTES=""` and record the difference — tell me.
 - The daemon stops itself on shutdown (`KillMode=control-group`, SIGTERM trap), so it

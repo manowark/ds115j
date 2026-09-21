@@ -1,0 +1,24 @@
+# syno-powerbtn-arm.service — re-send DSM rc boot bytes so the PIC reports the
+# power button (arming handshake, H1 confirmed live 2026-09-21).
+#
+# Runs once at boot, after ttyS1 exists and before/while syno-powerbtn starts
+# (order is not critical; the arming bytes can arrive any time before the press).
+# The daemon itself stays read-only; this unit is the ONLY place that writes the
+# two OEM LED-init bytes with newline, exactly like DSM rc does.
+
+[Unit]
+Description=DS115j PIC arming (rc boot bytes to /dev/ttyS1)
+DefaultDependencies=no
+After=systemd-udevd.service dev-ttyS1.device
+Wants=dev-ttyS1.device
+Before=syno-powerbtn.service syno-mcu-boot.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/syno-powerbtn-arm.sh
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=basic.target
